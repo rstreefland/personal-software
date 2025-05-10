@@ -4,8 +4,8 @@
   "description": "Tells you which bins to put out this week for Croydon (Kerbside - Wednesday B).",
   "start_url": "/bins/index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1976D2",
+  "background_color": "#1976d2",
+  "theme_color": "#1976d2",
   "icons": [
     {
       "src": "icons/icon-48x48.png",
