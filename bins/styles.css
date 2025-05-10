@@ -1,0 +1,170 @@
+:root {
+    --primary-bg: #f4f4f4;
+    --secondary-bg: white;
+    --text-color: #333;
+    --header-bg: #1976d2; /* Blue 700 */
+    --header-text: white;
+    --accent-color: #1976d2; /* Blue 700 */
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-strong-color: rgba(0, 0, 0, 0.2);
+    --footer-text-color: #777;
+
+    --update-msg-bg: #fff3e0; /* Light orange */
+    --update-msg-border: #ffcc80; /* Orange border */
+    --update-msg-text: #e65100; /* Dark orange text */
+
+    /* Bin colors - these remain constant */
+    --food-bin-bg: #795548; /* Brown */
+    --green-bin-bg: #4caf50; /* Green - Unchanged */
+    --blue-bin-bg: #2196f3; /* Blue */
+    --black-bin-bg: #424242; /* Dark Grey */
+    --bin-text-color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #121212;
+        --secondary-bg: #1e1e1e;
+        --text-color: #e0e0e0;
+        --header-bg: #0d47a1; /* Darker Blue for dark mode header */
+        --header-text: #e0e0e0;
+        --accent-color: #64b5f6; /* Lighter Blue (Blue 300) for dark mode */
+        --accent-emphasis-color: #90caf9; /* Even Lighter Blue (Blue 200) */
+        --border-color: #333333;
+        --shadow-color: rgba(255, 255, 255, 0.05);
+        --shadow-strong-color: rgba(255, 255, 255, 0.1);
+        --footer-text-color: #999;
+
+        --update-msg-bg: #2c1d00;
+        --update-msg-border: #593a00;
+        --update-msg-text: #ffcc80;
+    }
+}
+
+html {
+    color-scheme: light dark;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    padding: 1em 0;
+    text-align: center;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+header p {
+    margin: 0.2em 0 0;
+    font-size: 0.9em;
+}
+
+main {
+    padding: 15px;
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    box-shadow: 0 0 10px var(--shadow-color);
+    transition: background-color 0.3s;
+}
+
+section h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5em;
+    transition: color 0.3s, border-bottom-color 0.3s;
+}
+
+.collection-day-emphasis {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1em;
+    color: var(--accent-color);
+    transition: color 0.3s;
+    /*margin-bottom: 1.5em; !* Added margin for better spacing *!*/
+}
+
+#bins-to-put-out {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bin {
+    padding: 15px 20px;
+    border-radius: 6px;
+    color: var(--bin-text-color);
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 1px 3px var(--shadow-strong-color);
+    transition: transform 0.2s ease-in-out, background-color 0.3s;
+}
+
+.bin:hover {
+    transform: translateY(-2px);
+}
+
+.food-bin {
+    background-color: var(--food-bin-bg);
+}
+.green-bin {
+    background-color: var(--green-bin-bg); /* Stays green */
+}
+.blue-bin {
+    background-color: var(--blue-bin-bg);
+}
+.black-bin {
+    background-color: var(--black-bin-bg);
+}
+
+#update-message {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--update-msg-bg);
+    border: 1px solid var(--update-msg-border);
+    color: var(--update-msg-text);
+    border-radius: 8px;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 0.8em;
+    color: var(--footer-text-color);
+    transition: color 0.3s;
+}
+
+@media (min-width: 500px) {
+    #bins-to-put-out {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .bin {
+        min-width: 180px;
+        margin: 5px;
+    }
+}
