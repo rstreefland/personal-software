@@ -1,4 +1,4 @@
-const CACHE_NAME = "croydon-bin-day-cache-v1.3"; // Increment version to force update
+const CACHE_NAME = "croydon-bin-day-cache-v1.4"; // Increment version to force update
 const urlsToCache = [
   "/",
   "/index.html",
