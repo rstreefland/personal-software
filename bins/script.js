@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const today = new Date();
   // For testing:
-  // const today = new Date("2025-11-26T00:00:00Z"); // Day of last collection
+  // const today = new Date("2025-11-18T00:00:00Z"); // Day of last collection
   // const today = new Date("2025-11-28T12:00:00Z"); // Day after last collection
 
   currentDateDisplay.textContent = `Today: ${today.toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`;
@@ -127,10 +127,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // We are looking for the next collection *on or after* today
     if (todayNormalized.getTime() <= collectionDate.getTime()) {
       const day = collectionDate.getDate();
-      const weekday = collectionDate.toLocaleDateString("en-GB", { weekday: "long" });
+      const weekday = collectionDate.toLocaleDateString("en-GB", {
+        weekday: "long",
+      });
       const ordinalSuffix = getOrdinalSuffix(day);
 
-      let displayString = `Next collection on ${weekday} ${day}${ordinalSuffix}`;
+      let displayString;
+
+      const tomorrowNormalized = new Date(todayNormalized);
+      tomorrowNormalized.setDate(todayNormalized.getDate() + 1);
+
+      if (collectionDate.toDateString() === todayNormalized.toDateString()) {
+        displayString = "Next collection is today!";
+      } else if (
+        collectionDate.toDateString() === tomorrowNormalized.toDateString()
+      ) {
+        displayString = "Next collection is tomorrow!";
+      } else {
+        displayString = `Next collection is on ${weekday} ${day}${ordinalSuffix}`;
+      }
+
       if (collectionEntry.note) {
         displayString += ` (${collectionEntry.note})`;
       }
@@ -143,11 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
         addBinElement("General Waste", "black-bin");
       }
       if (collectionEntry.blue) {
-        addBinElement("Recycling (Paper & Card)", "blue-bin");
+        addBinElement("Paper & Card", "blue-bin");
       }
       if (collectionEntry.green) {
         addBinElement(
-          "Recycling (Plastics, Glass, Cans & Cartons)",
+          "Plastics, Glass, Cans & Cartons",
           "green-bin",
         );
       }
