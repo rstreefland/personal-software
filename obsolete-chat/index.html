@@ -444,8 +444,11 @@
         removeThinkingMessage();
         userInput.disabled = false; sendButton.disabled = false;
 
+        var responseTextForAlert = xhr.responseText || "No response text";
+
         if (xhr.status === 200) {
           try {
+            alert('Raw response (status 200): ' + responseTextForAlert); // DEBUG
             var response = JSON.parse(xhr.responseText);
             var botResponseText = '';
             var messageClass = 'bot-message';
@@ -454,18 +457,22 @@
               response.candidates[0].content && response.candidates[0].content.parts &&
               response.candidates[0].content.parts[0] && response.candidates[0].content.parts[0].text) {
               botResponseText = response.candidates[0].content.parts[0].text;
-              addMessageToChat(snarkdown(botResponseText), messageClass);
+              alert('Extracted bot text: ' + botResponseText); // DEBUG
+              addMessageToChat(escapeHtml(botResponseText), messageClass);
             } else if (response.promptFeedback && response.promptFeedback.blockReason) {
               botResponseText = "Blocked: " + response.promptFeedback.blockReason;
               if (response.promptFeedback.safetyRatings) {
                 botResponseText += " - Safety Ratings: " + JSON.stringify(response.promptFeedback.safetyRatings);
               }
-              addMessageToChat(botResponseText, 'bot-error-message'); // Use bot-error-message for blocked content
+              alert('Blocked response: ' + botResponseText); // DEBUG
+              addMessageToChat(botResponseText, 'bot-error-message');
             } else {
               botResponseText = 'Error: Received an unexpected response structure.';
+              alert('Unexpected structure. Response: ' + xhr.responseText); // DEBUG
               addMessageToChat(botResponseText, 'bot-error-message');
             }
           } catch (e) {
+            alert('JSON Parse Error: ' + e.message + "\nResponse: " + responseTextForAlert); // DEBUG
             addMessageToChat('Error parsing API response: ' + e.message, 'bot-error-message');
           }
         } else {
@@ -480,9 +487,13 @@
               }
             } catch (e) { /* Ignore parse error, use original errorTxt */ }
           }
+          alert('API Error (status ' + xhr.status + '): ' + errorTxt + "\nResponse: " + responseTextForAlert); // DEBUG
           addMessageToChat(errorTxt, 'bot-error-message');
         }
         messageArea.scrollTop = messageArea.scrollHeight;
+      } else {
+        // Optional: Alert for other readyStates if needed for deep debugging
+        // alert('XHR readyState: ' + xhr.readyState + ', status: ' + xhr.status);
       }
     };
 
@@ -490,12 +501,15 @@
       removeThinkingMessage();
       userInput.disabled = false; sendButton.disabled = false;
       var netErr = 'Network Error: Could not connect. Please check your connection.';
+      alert('Network onerror: ' + netErr); // DEBUG
       addMessageToChat(netErr, 'bot-error-message');
       messageArea.scrollTop = messageArea.scrollHeight;
     };
 
+    alert('Sending XHR for: ' + text); // DEBUG
     xhr.send(JSON.stringify(payload));
   }
+
 
   saveSettingsButton.addEventListener('click', saveSettings);
   toggleSettingsButton.addEventListener('click', toggleSettingsPanel);
