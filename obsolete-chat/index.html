@@ -5,32 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        body {
-            font-family: Helvetica, Arial, sans-serif;
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden; /* Prevent body scroll */
+            font-family: Helvetica, Arial, sans-serif;
             background-color: #f0f0f0;
             color: #333;
             font-size: 16px;
         }
         #app-container {
-            margin: 0 auto;
+            height: 100%;
+            position: relative; /* For absolute positioning of children */
             background-color: #fff;
-            min-height: 100vh;
             display: block;
         }
         #header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 45px; /* Fixed height */
             background-color: #4a90e2;
             color: white;
-            padding: 12px;
+            padding: 0 12px; /* Adjusted padding */
+            line-height: 45px; /* Vertical align title */
             text-align: center;
-            position: relative;
             border-bottom: 1px solid #3a7bc8;
+            z-index: 30;
         }
         #header h1 {
             margin: 0;
             font-size: 1.3em;
             font-weight: bold;
+            display: inline; /* For centering with text-align */
         }
         #header-buttons {
             position: absolute;
@@ -54,11 +63,17 @@
             background-color: #5bc0de;
         }
         #settings-panel {
+            position: absolute;
+            top: 45px; /* Below header */
+            left: 0;
+            right: 0;
             background-color: #f9f9f9;
             padding: 15px;
             border-bottom: 1px solid #ddd;
             -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 20;
+            display: none; /* Initially hidden */
         }
         #settings-panel h2 { margin-top:0; margin-bottom:15px; font-size:1.1em; color:#555; }
         #settings-panel label { display:block; margin-bottom:5px; font-size:0.9em; color:#333; }
@@ -71,14 +86,23 @@
             -webkit-border-radius:4px; border-radius:4px; cursor:pointer; font-size:0.9em;
         }
         #settings-status { margin-top:10px; font-size:0.8em; color:#777; }
-        #chat-container { padding: 10px; }
+
+        #chat-container {
+            position: absolute;
+            top: 45px; /* Default: below header */
+            bottom: 56px; /* Fixed height of input-area */
+            left: 0;
+            right: 0;
+            padding: 0; /* Padding moved to message-area */
+            overflow: hidden; /* Prevent chat-container itself from scrolling */
+        }
         #message-area {
-            height: calc(100vh - 45px);
-            min-height: 200px;
+            height: 100%; /* Fill chat-container */
+            min-height: 0; /* Override previous min-height */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 10px;
-            padding-bottom: 66px;
+            padding-bottom: 10px; /* Adjusted from 66px as input area is outside */
             border: 1px solid #e0e0e0;
             background-color: #fdfdfd;
             -webkit-border-radius: 4px;
@@ -94,9 +118,8 @@
             line-height:1.4;
             word-wrap:break-word;
             font-size:0.95em;
-            /* white-space: pre-wrap; /* Potentially review with snarkdown */ */
         }
-        .message pre { white-space: pre-wrap; word-wrap: break-word; } /* For code blocks */
+        .message pre { white-space: pre-wrap; word-wrap: break-word; }
         .user-message {
             background-color:#007bff;
             color:white;
@@ -115,31 +138,39 @@
         .system-message { text-align:center; font-size:0.8em; color:#888; margin-bottom:10px; }
 
         #input-area {
-            display: -webkit-box;
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            background-color: #f8f8f8;
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
+            height: 56px; /* Fixed height */
+            display: -webkit-box; /* Old flexbox for iOS 5 */
+            display: -moz-box;    /* Old flexbox for Firefox */
+            display: box;         /* Old flexbox */
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f8f8f8;
             z-index: 100;
             -webkit-box-sizing: border-box;
             box-sizing: border-box;
+            -webkit-box-align: center; /* Vertically align items in old flexbox */
+            box-align: center;
         }
         #userInput {
-            -webkit-box-flex:1; flex-grow:1; padding:10px; border:1px solid #ccc;
+            -webkit-box-flex: 1;  /* Old flexbox grow */
+            -moz-box-flex: 1;     /* Old flexbox grow */
+            box-flex: 1;          /* Old flexbox grow */
+            padding:10px; border:1px solid #ccc;
             -webkit-border-radius:20px; border-radius:20px; margin-right:8px; font-size:0.95em;
+            height: 18px; /* Base height, padding will expand it */
+            line-height: 18px;
         }
         #sendButton {
             background-color:#007bff; color:white; border:none; padding:10px 18px;
             -webkit-border-radius:20px; border-radius:20px; cursor:pointer; font-size:0.95em; font-weight:bold;
         }
         #sendButton:disabled { background-color:#a0c7e8; }
-        body.settings-visible #message-area {
-            height: calc(100vh - 45px - 186px);
-        }
+        /* body.settings-visible class is kept if other styles might use it,
+           but message-area height is now controlled by JS adjusting chat-container top */
     </style>
 </head>
 <body>
@@ -151,7 +182,7 @@
             <button id="toggleSettingsButton">Settings</button>
         </div>
     </div>
-    <div id="settings-panel" style="display: none;">
+    <div id="settings-panel"> {/* style="display: none;" is set by default in CSS */}
         <h2>Configuration</h2>
         <label for="apiKey">Google AI API Key:</label>
         <input type="password" id="apiKey" placeholder="Enter your API Key">
@@ -279,6 +310,7 @@
   var messageArea = document.getElementById('message-area');
   var userInput = document.getElementById('userInput');
   var sendButton = document.getElementById('sendButton');
+  var chatContainer = document.getElementById('chat-container'); // Added
 
   var currentApiKey = '';
   var MODEL_ID = 'gemini-2.5-flash-preview-05-20';
@@ -306,7 +338,12 @@
       settingsStatus.textContent = 'Please configure API Key.';
       settingsStatus.style.color = 'red';
       userInput.disabled = true; sendButton.disabled = true;
-      settingsPanel.style.display = 'block'; document.body.className = 'settings-visible';
+      settingsPanel.style.display = 'block';
+      document.body.className = 'settings-visible'; // Keep for potential other uses
+      // Adjust layout for visible settings panel on load
+      settingsPanel.style.display = 'block'; // Ensure it's block before measuring
+      var settingsPanelHeight = settingsPanel.offsetHeight;
+      chatContainer.style.top = (45 + settingsPanelHeight) + 'px';
       addSystemMessage('Welcome! Set API Key to begin.');
     }
   }
@@ -324,11 +361,22 @@
       userInput.disabled = true; sendButton.disabled = true;
     }
   }
+
   function toggleSettingsPanel() {
-    var vis = settingsPanel.style.display === 'block';
-    settingsPanel.style.display = vis ? 'none' : 'block';
-    document.body.className = vis ? '' : 'settings-visible';
+    var isCurrentlyVisible = settingsPanel.style.display === 'block';
+    if (isCurrentlyVisible) {
+      settingsPanel.style.display = 'none';
+      chatContainer.style.top = '45px'; // Header height
+      document.body.className = '';
+    } else {
+      settingsPanel.style.display = 'block';
+      // Ensure panel is rendered to get correct offsetHeight
+      var settingsPanelHeight = settingsPanel.offsetHeight;
+      chatContainer.style.top = (45 + settingsPanelHeight) + 'px'; // Header + Panel height
+      document.body.className = 'settings-visible';
+    }
   }
+
   function startNewChat() {
     messageArea.innerHTML = '';
     addSystemMessage('New chat started.');
@@ -343,12 +391,10 @@
     var div = document.createElement('div');
     div.className = 'message ' + senderClass;
     if (text) {
-      // User messages and explicit error messages are HTML escaped
-      // Bot messages are initially empty, then populated with snarkdown
       if (senderClass === 'user-message' || senderClass === 'bot-error-message') {
         div.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
       } else {
-        div.innerHTML = text; // For initial empty bot message
+        div.innerHTML = text;
       }
     }
     wrapper.appendChild(div);
@@ -392,14 +438,15 @@
             var currentRawText = targetDiv.getAttribute('data-raw-text') || "";
             currentRawText += botResponseChunk;
             targetDiv.setAttribute('data-raw-text', currentRawText);
-            targetDiv.innerHTML = snarkdown(currentRawText); // Use snarkdown
+            targetDiv.innerHTML = snarkdown(currentRawText);
             messageArea.scrollTop = messageArea.scrollHeight;
 
           } else if (parsed.error) {
             var raw = targetDiv.getAttribute('data-raw-text') || "";
-            // Use snarkdown for existing content, then append escaped error
             targetDiv.innerHTML = snarkdown(raw) + '<br><span style="color:red;">Stream Error: ' + escapeHtml(parsed.error.message) + '</span>';
-            targetDiv.className += ' bot-error-message';
+            if (targetDiv.className.indexOf('bot-error-message') === -1) {
+              targetDiv.className += ' bot-error-message';
+            }
           }
           searchIndex = objEndIndex + 1;
           if (searchIndex >= streamBuffer.length) streamBuffer = "";
@@ -413,7 +460,10 @@
     if (!msgText) return;
     if (!currentApiKey) {
       addMessageToChat('Error: API Key not set.', 'bot-error-message');
-      settingsPanel.style.display = 'block'; document.body.className = 'settings-visible'; return;
+      if (settingsPanel.style.display !== 'block') { // Show settings if not already visible
+        toggleSettingsPanel();
+      }
+      return;
     }
     addMessageToChat(msgText, 'user-message');
     userInput.value = ''; userInput.disabled = true; sendButton.disabled = true;
@@ -439,7 +489,7 @@
     xhr.setRequestHeader('Content-Type', 'application/json');
 
     xhr.onreadystatechange = function() {
-      if (xhr.readyState >= 3) {
+      if (xhr.readyState >= 3) { // LOADING or DONE
         if (!thinkingMsgRemoved) {
           var thinkingMsgs = messageArea.getElementsByClassName('system-message');
           if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
@@ -449,15 +499,15 @@
         }
 
         if (!currentBotMessageDiv) {
-          currentBotMessageDiv = addMessageToChat("", 'bot-message'); // Pass empty string
+          currentBotMessageDiv = addMessageToChat("", 'bot-message');
           currentBotMessageDiv.setAttribute('data-raw-text', '');
         }
 
         if (currentBotMessageDiv) processStreamData(xhr.responseText, currentBotMessageDiv);
       }
-      if (xhr.readyState === 4) {
+      if (xhr.readyState === 4) { // DONE
         userInput.disabled = false; sendButton.disabled = false;
-        if (!thinkingMsgRemoved) {
+        if (!thinkingMsgRemoved) { // Ensure it's removed if not done in readyState 3
           var thinkingMsgs = messageArea.getElementsByClassName('system-message');
           if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
             messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
@@ -465,36 +515,41 @@
         }
         if (xhr.status !== 200) {
           var errorTxt = 'API Error: ' + xhr.status + ' ' + (xhr.statusText || 'Request failed');
+          if (xhr.status === 0) { // Often indicates network error / CORS / TLS issue
+            errorTxt = 'API Error: Could not connect to server. Check network or API configuration.';
+          }
           if (currentBotMessageDiv) {
             var rawSoFar = currentBotMessageDiv.getAttribute('data-raw-text') || "";
-            // Use snarkdown for existing content, then append escaped error
             var finalErrorHtml = snarkdown(rawSoFar) + '<br><strong style="color:red;">' + escapeHtml(errorTxt) + '</strong>';
             currentBotMessageDiv.innerHTML = finalErrorHtml;
-            if (!currentBotMessageDiv.className.includes('bot-error-message')) currentBotMessageDiv.className += ' bot-error-message';
+            if (currentBotMessageDiv.className.indexOf('bot-error-message') === -1) {
+              currentBotMessageDiv.className += ' bot-error-message';
+            }
           } else {
             addMessageToChat(errorTxt, 'bot-error-message');
           }
         }
-        streamBuffer = ""; streamLastProcessedLength = 0;
+        streamBuffer = ""; streamLastProcessedLength = 0; // Reset for next call
       }
     };
 
-    xhr.onerror = function() {
+    xhr.onerror = function() { // Network errors
       userInput.disabled = false; sendButton.disabled = false;
       var thinkingMsgs = messageArea.getElementsByClassName('system-message');
       if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
         messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
       }
-      var netErr = 'Network Error: Could not connect.';
+      var netErr = 'Network Error: Could not connect. Please check your connection.';
       if (currentBotMessageDiv) {
         var rawOnError = currentBotMessageDiv.getAttribute('data-raw-text') || "";
-        // Use snarkdown for existing content, then append escaped error
         currentBotMessageDiv.innerHTML = snarkdown(rawOnError) + '<br><strong style="color:red;">' + escapeHtml(netErr) + '</strong>';
-        if (!currentBotMessageDiv.className.includes('bot-error-message')) currentBotMessageDiv.className += ' bot-error-message';
+        if (currentBotMessageDiv.className.indexOf('bot-error-message') === -1) {
+          currentBotMessageDiv.className += ' bot-error-message';
+        }
       } else {
         addMessageToChat(netErr, 'bot-error-message');
       }
-      streamBuffer = ""; streamLastProcessedLength = 0;
+      streamBuffer = ""; streamLastProcessedLength = 0; // Reset
     };
 
     xhr.send(JSON.stringify(payload));
@@ -506,15 +561,10 @@
   sendButton.addEventListener('click', sendMessage);
   userInput.addEventListener('keypress', function(e) { if (e.key==='Enter'||e.keyCode===13) { if(!sendButton.disabled) sendMessage();} });
 
-  // Ensure snarkdown is available before calling loadSettings if it relied on it
-  // In this case, loadSettings doesn't directly use snarkdown, so order is fine.
   if (typeof snarkdown === 'undefined') {
     console.error("snarkdown.js is not loaded. Markdown parsing will not work.");
-    // Optionally, display an error to the user in the UI
     var errorDiv = document.createElement('div');
-    errorDiv.style.color = 'red';
-    errorDiv.style.padding = '10px';
-    errorDiv.style.textAlign = 'center';
+    errorDiv.style.color = 'red'; errorDiv.style.padding = '10px'; errorDiv.style.textAlign = 'center';
     errorDiv.textContent = 'Error: snarkdown.js not found. Markdown rendering will be affected.';
     document.body.insertBefore(errorDiv, document.body.firstChild);
   }
