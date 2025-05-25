@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            font-size: 16px;
+        }
+        #app-container {
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+            display: block;
+        }
+        #header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #3a7bc8;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        #header-buttons {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+        #header-buttons button {
+            background-color: #3a7bc8;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        #newChatButton {
+            background-color: #5bc0de;
+        }
+        #settings-panel {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        #settings-panel h2 { margin-top:0; margin-bottom:15px; font-size:1.1em; color:#555; }
+        #settings-panel label { display:block; margin-bottom:5px; font-size:0.9em; color:#333; }
+        #settings-panel input[type="password"] {
+            width:100%; padding:10px; margin-bottom:12px; border:1px solid #ccc;
+            -webkit-border-radius:4px; border-radius:4px; -webkit-box-sizing:border-box; box-sizing:border-box; font-size:0.9em;
+        }
+        #settings-panel button {
+            background-color:#5cb85c; color:white; border:none; padding:10px 15px;
+            -webkit-border-radius:4px; border-radius:4px; cursor:pointer; font-size:0.9em;
+        }
+        #settings-status { margin-top:10px; font-size:0.8em; color:#777; }
+        #chat-container { padding: 10px; }
+        #message-area {
+            height: calc(100vh - 45px);
+            min-height: 200px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px;
+            padding-bottom: 66px;
+            border: 1px solid #e0e0e0;
+            background-color: #fdfdfd;
+            -webkit-border-radius: 4px;
+            border-radius: 4px;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .message-wrapper { overflow: auto; margin-bottom: 10px; }
+        .message {
+            padding:10px 14px;
+            -webkit-border-radius:18px;
+            border-radius:18px;
+            line-height:1.4;
+            word-wrap:break-word;
+            font-size:0.95em;
+            /* white-space: pre-wrap; /* Potentially review with snarkdown */ */
+        }
+        .message pre { white-space: pre-wrap; word-wrap: break-word; } /* For code blocks */
+        .user-message {
+            background-color:#007bff;
+            color:white;
+            float:right;
+            clear:both;
+            border-bottom-right-radius:6px;
+            max-width: 75%;
+        }
+        .bot-message {
+            background-color:#e9ecef;
+            color:#333;
+            clear:both;
+            border-bottom-left-radius:6px;
+        }
+        .bot-error-message { background-color:#f8d7da !important; color:#721c24 !important; border:1px solid #f5c6cb; }
+        .system-message { text-align:center; font-size:0.8em; color:#888; margin-bottom:10px; }
+
+        #input-area {
+            display: -webkit-box;
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f8f8f8;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        #userInput {
+            -webkit-box-flex:1; flex-grow:1; padding:10px; border:1px solid #ccc;
+            -webkit-border-radius:20px; border-radius:20px; margin-right:8px; font-size:0.95em;
+        }
+        #sendButton {
+            background-color:#007bff; color:white; border:none; padding:10px 18px;
+            -webkit-border-radius:20px; border-radius:20px; cursor:pointer; font-size:0.95em; font-weight:bold;
+        }
+        #sendButton:disabled { background-color:#a0c7e8; }
+        body.settings-visible #message-area {
+            height: calc(100vh - 45px - 186px);
+        }
+    </style>
+</head>
+<body>
+<div id="app-container">
+    <div id="header">
+        <h1>Gemini Chat</h1>
+        <div id="header-buttons">
+            <button id="newChatButton">New Chat</button>
+            <button id="toggleSettingsButton">Settings</button>
+        </div>
+    </div>
+    <div id="settings-panel" style="display: none;">
+        <h2>Configuration</h2>
+        <label for="apiKey">Google AI API Key:</label>
+        <input type="password" id="apiKey" placeholder="Enter your API Key">
+        <button id="saveSettings">Save API Key</button>
+        <p id="settings-status"></p>
+    </div>
+    <div id="chat-container">
+        <div id="message-area"></div>
+    </div>
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Type your message..." disabled>
+        <button id="sendButton" disabled>Send</button>
+    </div>
+</div>
+<script>
+  function snarkdown(a, o) {
+    var e = {
+      "": ["<em>", "</em>"],
+      _: ["<strong>", "</strong>"],
+      "*": ["<strong>", "</strong>"],
+      "~": ["<s>", "</s>"],
+      "\n": ["<br />"],
+      " ": ["<br />"],
+      "-": ["<hr />"],
+    };
+    function n(e) {
+      return e.replace(
+        RegExp("^" + (e.match(/^(\t| )+/) || "")[0], "gm"),
+        "",
+      );
+    }
+    function r(e) {
+      return (e + "")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+    var c,
+      l,
+      s,
+      g,
+      p,
+      u =
+        /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
+      m = [],
+      h = "",
+      i = o || {},
+      d = 0;
+    function $(n) {
+      var r = e[n[1] || ""],
+        t = m[m.length - 1] == n;
+      return r
+        ? r[1]
+          ? (t ? m.pop() : m.push(n), r[0 | t])
+          : r[0]
+        : n;
+    }
+    function f() {
+      for (var e = ""; m.length; ) e += $(m[m.length - 1]);
+      return e;
+    }
+    a = a
+      .replace(/^\[(.+?)\]:\s*(.+)$/gm, function (e, n, r) {
+        return (i[n.toLowerCase()] = r), "";
+      })
+      .replace(/^\n+|\n+$/g, "");
+    while ((s = u.exec(a))) {
+      l = a.substring(d, s.index);
+      d = u.lastIndex;
+      c = s[0];
+      l.match(/[^\\](\\\\)*\\$/) ||
+      ((p = s[3] || s[4])
+        ? (c =
+          '<pre class="code ' +
+          (s[4] ? "poetry" : s[2].toLowerCase()) +
+          '"><code' +
+          (s[2] ? ' class="language-' + s[2].toLowerCase() + '"' : "") +
+          ">" +
+          n(r(p).replace(/^\n+|\n+$/g, "")) +
+          "</code></pre>")
+        : (p = s[6])
+          ? (p.match(/\./) && (s[5] = s[5].replace(/^\d+/gm, "")),
+            (g = snarkdown(n(s[5].replace(/^\s*[>*+.-]/gm, "")))),
+            ">" == p
+              ? (p = "blockquote")
+              : ((p = p.match(/\./) ? "ol" : "ul"),
+                (g = g.replace(/^(.*)(\n|$)/gm, "<li>$1</li>"))),
+            (c = "<" + p + ">" + g + "</" + p + ">"))
+          : s[8]
+            ? (c = '<img src="' + r(s[8]) + '" alt="' + r(s[7]) + '">')
+            : s[10]
+              ? ((h = h.replace(
+                "<a>",
+                '<a href="' + r(s[11] || i[l.toLowerCase()]) + '">',
+              )),
+                (c = f() + "</a>"))
+              : s[9]
+                ? (c = "<a>")
+                : s[12] || s[14]
+                  ? (c =
+                    "<" +
+                    (p = "h" + (s[14] ? s[14].length : s[13] > "=" ? 1 : 2)) +
+                    ">" +
+                    snarkdown(s[12] || s[15], i) +
+                    "</" +
+                    p +
+                    ">")
+                  : s[16]
+                    ? (c = "<code>" + r(s[16]) + "</code>")
+                    : (s[17] || s[1]) && (c = $(s[17] || "--"))),
+        (h += l),
+        (h += c);
+    }
+    return (h + a.substring(d) + f()).replace(/^\n+|\n+$/g, "");
+  }
+</script>
+<script>
+  var apiKeyInput = document.getElementById('apiKey');
+  var saveSettingsButton = document.getElementById('saveSettings');
+  var settingsStatus = document.getElementById('settings-status');
+  var toggleSettingsButton = document.getElementById('toggleSettingsButton');
+  var settingsPanel = document.getElementById('settings-panel');
+  var newChatButton = document.getElementById('newChatButton');
+
+  var messageArea = document.getElementById('message-area');
+  var userInput = document.getElementById('userInput');
+  var sendButton = document.getElementById('sendButton');
+
+  var currentApiKey = '';
+  var MODEL_ID = 'gemini-2.5-flash-preview-05-20';
+  var API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
+
+  var streamBuffer = "";
+  var streamLastProcessedLength = 0;
+  var currentBotMessageDiv = null;
+
+  function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+  }
+
+  function loadSettings() {
+    currentApiKey = localStorage.getItem('googleAiApiKeyStream');
+    if (currentApiKey) {
+      apiKeyInput.value = currentApiKey;
+      settingsStatus.textContent = 'API Key loaded.';
+      settingsStatus.style.color = 'green';
+      userInput.disabled = false; sendButton.disabled = false;
+      addSystemMessage('Configuration loaded. Chat with ' + MODEL_ID + '.');
+    } else {
+      settingsStatus.textContent = 'Please configure API Key.';
+      settingsStatus.style.color = 'red';
+      userInput.disabled = true; sendButton.disabled = true;
+      settingsPanel.style.display = 'block'; document.body.className = 'settings-visible';
+      addSystemMessage('Welcome! Set API Key to begin.');
+    }
+  }
+  function saveSettings() {
+    currentApiKey = apiKeyInput.value.trim();
+    if (currentApiKey) {
+      localStorage.setItem('googleAiApiKeyStream', currentApiKey);
+      settingsStatus.textContent = 'API Key saved!';
+      settingsStatus.style.color = 'green';
+      userInput.disabled = false; sendButton.disabled = false;
+      addSystemMessage('Configuration updated.');
+    } else {
+      settingsStatus.textContent = 'API Key is required.';
+      settingsStatus.style.color = 'red';
+      userInput.disabled = true; sendButton.disabled = true;
+    }
+  }
+  function toggleSettingsPanel() {
+    var vis = settingsPanel.style.display === 'block';
+    settingsPanel.style.display = vis ? 'none' : 'block';
+    document.body.className = vis ? '' : 'settings-visible';
+  }
+  function startNewChat() {
+    messageArea.innerHTML = '';
+    addSystemMessage('New chat started.');
+    if (currentBotMessageDiv) currentBotMessageDiv = null;
+    streamBuffer = ""; streamLastProcessedLength = 0;
+    userInput.focus();
+  }
+
+  function addMessageToChat(text, senderClass) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'message-wrapper';
+    var div = document.createElement('div');
+    div.className = 'message ' + senderClass;
+    if (text) {
+      // User messages and explicit error messages are HTML escaped
+      // Bot messages are initially empty, then populated with snarkdown
+      if (senderClass === 'user-message' || senderClass === 'bot-error-message') {
+        div.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+      } else {
+        div.innerHTML = text; // For initial empty bot message
+      }
+    }
+    wrapper.appendChild(div);
+    messageArea.appendChild(wrapper);
+    messageArea.scrollTop = messageArea.scrollHeight;
+    return div;
+  }
+
+  function addSystemMessage(text) {
+    var sysDiv = document.createElement('div');
+    sysDiv.className = 'system-message';
+    sysDiv.textContent = text;
+    messageArea.appendChild(sysDiv);
+    messageArea.scrollTop = messageArea.scrollHeight;
+  }
+
+  function processStreamData(xhrResponseText, targetDiv) {
+    var newData = xhrResponseText.substring(streamLastProcessedLength);
+    streamBuffer += newData;
+    streamLastProcessedLength = xhrResponseText.length;
+    var searchIndex = 0;
+
+    while (searchIndex < streamBuffer.length) {
+      var objStartIndex = -1;
+      for (var i = searchIndex; i < streamBuffer.length; i++) { if (streamBuffer[i] === '{') { objStartIndex = i; break; } }
+      if (objStartIndex === -1) { streamBuffer = streamBuffer.substring(searchIndex); break; }
+      var depth = 0; var objEndIndex = -1;
+      for (var i = objStartIndex; i < streamBuffer.length; i++) {
+        if (streamBuffer[i] === '{') depth++;
+        else if (streamBuffer[i] === '}') { depth--; if (depth === 0) { objEndIndex = i; break; } }
+      }
+      if (objEndIndex !== -1) {
+        var jsonString = streamBuffer.substring(objStartIndex, objEndIndex + 1);
+        try {
+          var parsed = JSON.parse(jsonString);
+          if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content &&
+            parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] &&
+            parsed.candidates[0].content.parts[0].text) {
+
+            var botResponseChunk = parsed.candidates[0].content.parts[0].text;
+            var currentRawText = targetDiv.getAttribute('data-raw-text') || "";
+            currentRawText += botResponseChunk;
+            targetDiv.setAttribute('data-raw-text', currentRawText);
+            targetDiv.innerHTML = snarkdown(currentRawText); // Use snarkdown
+            messageArea.scrollTop = messageArea.scrollHeight;
+
+          } else if (parsed.error) {
+            var raw = targetDiv.getAttribute('data-raw-text') || "";
+            // Use snarkdown for existing content, then append escaped error
+            targetDiv.innerHTML = snarkdown(raw) + '<br><span style="color:red;">Stream Error: ' + escapeHtml(parsed.error.message) + '</span>';
+            targetDiv.className += ' bot-error-message';
+          }
+          searchIndex = objEndIndex + 1;
+          if (searchIndex >= streamBuffer.length) streamBuffer = "";
+        } catch (e) { streamBuffer = streamBuffer.substring(objStartIndex); searchIndex = 0; break; }
+      } else { streamBuffer = streamBuffer.substring(objStartIndex); searchIndex = 0; break; }
+    }
+  }
+
+  function sendMessage() {
+    var msgText = userInput.value.trim();
+    if (!msgText) return;
+    if (!currentApiKey) {
+      addMessageToChat('Error: API Key not set.', 'bot-error-message');
+      settingsPanel.style.display = 'block'; document.body.className = 'settings-visible'; return;
+    }
+    addMessageToChat(msgText, 'user-message');
+    userInput.value = ''; userInput.disabled = true; sendButton.disabled = true;
+    addSystemMessage(MODEL_ID + ' is thinking...');
+    callGeminiApi(msgText);
+  }
+
+  function callGeminiApi(text) {
+    var apiUrl = API_BASE_URL + MODEL_ID + ':streamGenerateContent?key=' + currentApiKey;
+    var payload = {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: text }]
+        }
+      ]
+    };
+    streamBuffer = ""; streamLastProcessedLength = 0;
+    currentBotMessageDiv = null;
+    var thinkingMsgRemoved = false;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', apiUrl, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState >= 3) {
+        if (!thinkingMsgRemoved) {
+          var thinkingMsgs = messageArea.getElementsByClassName('system-message');
+          if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
+            messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
+          }
+          thinkingMsgRemoved = true;
+        }
+
+        if (!currentBotMessageDiv) {
+          currentBotMessageDiv = addMessageToChat("", 'bot-message'); // Pass empty string
+          currentBotMessageDiv.setAttribute('data-raw-text', '');
+        }
+
+        if (currentBotMessageDiv) processStreamData(xhr.responseText, currentBotMessageDiv);
+      }
+      if (xhr.readyState === 4) {
+        userInput.disabled = false; sendButton.disabled = false;
+        if (!thinkingMsgRemoved) {
+          var thinkingMsgs = messageArea.getElementsByClassName('system-message');
+          if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
+            messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
+          }
+        }
+        if (xhr.status !== 200) {
+          var errorTxt = 'API Error: ' + xhr.status + ' ' + (xhr.statusText || 'Request failed');
+          if (currentBotMessageDiv) {
+            var rawSoFar = currentBotMessageDiv.getAttribute('data-raw-text') || "";
+            // Use snarkdown for existing content, then append escaped error
+            var finalErrorHtml = snarkdown(rawSoFar) + '<br><strong style="color:red;">' + escapeHtml(errorTxt) + '</strong>';
+            currentBotMessageDiv.innerHTML = finalErrorHtml;
+            if (!currentBotMessageDiv.className.includes('bot-error-message')) currentBotMessageDiv.className += ' bot-error-message';
+          } else {
+            addMessageToChat(errorTxt, 'bot-error-message');
+          }
+        }
+        streamBuffer = ""; streamLastProcessedLength = 0;
+      }
+    };
+
+    xhr.onerror = function() {
+      userInput.disabled = false; sendButton.disabled = false;
+      var thinkingMsgs = messageArea.getElementsByClassName('system-message');
+      if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
+        messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
+      }
+      var netErr = 'Network Error: Could not connect.';
+      if (currentBotMessageDiv) {
+        var rawOnError = currentBotMessageDiv.getAttribute('data-raw-text') || "";
+        // Use snarkdown for existing content, then append escaped error
+        currentBotMessageDiv.innerHTML = snarkdown(rawOnError) + '<br><strong style="color:red;">' + escapeHtml(netErr) + '</strong>';
+        if (!currentBotMessageDiv.className.includes('bot-error-message')) currentBotMessageDiv.className += ' bot-error-message';
+      } else {
+        addMessageToChat(netErr, 'bot-error-message');
+      }
+      streamBuffer = ""; streamLastProcessedLength = 0;
+    };
+
+    xhr.send(JSON.stringify(payload));
+  }
+
+  saveSettingsButton.addEventListener('click', saveSettings);
+  toggleSettingsButton.addEventListener('click', toggleSettingsPanel);
+  newChatButton.addEventListener('click', startNewChat);
+  sendButton.addEventListener('click', sendMessage);
+  userInput.addEventListener('keypress', function(e) { if (e.key==='Enter'||e.keyCode===13) { if(!sendButton.disabled) sendMessage();} });
+
+  // Ensure snarkdown is available before calling loadSettings if it relied on it
+  // In this case, loadSettings doesn't directly use snarkdown, so order is fine.
+  if (typeof snarkdown === 'undefined') {
+    console.error("snarkdown.js is not loaded. Markdown parsing will not work.");
+    // Optionally, display an error to the user in the UI
+    var errorDiv = document.createElement('div');
+    errorDiv.style.color = 'red';
+    errorDiv.style.padding = '10px';
+    errorDiv.style.textAlign = 'center';
+    errorDiv.textContent = 'Error: snarkdown.js not found. Markdown rendering will be affected.';
+    document.body.insertBefore(errorDiv, document.body.firstChild);
+  }
+  loadSettings();
+</script>
+</body>
+</html>
