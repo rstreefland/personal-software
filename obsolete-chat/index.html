@@ -102,7 +102,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 10px;
-            padding-bottom: 10px; /* Adjusted from 66px as input area is outside */
+            padding-bottom: 10px;
             border: 1px solid #e0e0e0;
             background-color: #fdfdfd;
             -webkit-border-radius: 4px;
@@ -143,39 +143,36 @@
             left: 0;
             right: 0;
             height: 100px; /* Fixed height */
-            display: -webkit-box; /* Old flexbox for iOS 5 */
-            display: -moz-box;    /* Old flexbox for Firefox */
-            display: box;         /* Old flexbox */
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
             padding: 10px;
             border-top: 1px solid #ddd;
             background-color: #f8f8f8;
             z-index: 100;
             -webkit-box-sizing: border-box;
             box-sizing: border-box;
-            -webkit-box-align: center; /* Vertically align items in old flexbox */
+            -webkit-box-align: center;
             box-align: center;
         }
         #userInput {
-            -webkit-box-flex: 1;  /* Old flexbox grow */
-            -moz-box-flex: 1;     /* Old flexbox grow */
-            box-flex: 1;          /* Old flexbox grow */
+            -webkit-box-flex: 1;
+            -moz-box-flex: 1;
+            box-flex: 1;
             padding:10px; border:1px solid #ccc;
             -webkit-border-radius:20px; border-radius:20px;
-            /* margin-right:8px; /* Removed */
             font-size:0.95em;
-            height: 18px; /* Base height, padding will expand it */
+            height: 18px;
             line-height: 18px;
-            -webkit-box-sizing: border-box; /* Added for robustness */
-            box-sizing: border-box;         /* Added for robustness */
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
         }
         #sendButton {
             background-color:#007bff; color:white; border:none; padding:10px 18px;
             -webkit-border-radius:20px; border-radius:20px; cursor:pointer; font-size:0.95em; font-weight:bold;
-            margin-left: 8px; /* Added to maintain gap */
+            margin-left: 8px;
         }
         #sendButton:disabled { background-color:#a0c7e8; }
-        /* body.settings-visible class is kept if other styles might use it,
-           but message-area height is now controlled by JS adjusting chat-container top */
     </style>
 </head>
 <body>
@@ -187,7 +184,7 @@
             <button id="toggleSettingsButton">Settings</button>
         </div>
     </div>
-    <div id="settings-panel"> {/* style="display: none;" is set by default in CSS */}
+    <div id="settings-panel">
         <h2>Configuration</h2>
         <label for="apiKey">Google AI API Key:</label>
         <input type="password" id="apiKey" placeholder="Enter your API Key">
@@ -319,15 +316,11 @@
   var messageArea = document.getElementById('message-area');
   var userInput = document.getElementById('userInput');
   var sendButton = document.getElementById('sendButton');
-  var chatContainer = document.getElementById('chat-container'); // Added
+  var chatContainer = document.getElementById('chat-container');
 
   var currentApiKey = '';
   var MODEL_ID = 'gemini-2.5-flash-preview-05-20';
   var API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
-
-  var streamBuffer = "";
-  var streamLastProcessedLength = 0;
-  var currentBotMessageDiv = null;
 
   function escapeHtml(text) {
     if (typeof text !== 'string') return '';
@@ -348,9 +341,6 @@
       settingsStatus.style.color = 'red';
       userInput.disabled = true; sendButton.disabled = true;
       settingsPanel.style.display = 'block';
-      document.body.className = 'settings-visible'; // Keep for potential other uses
-      // Adjust layout for visible settings panel on load
-      settingsPanel.style.display = 'block'; // Ensure it's block before measuring
       var settingsPanelHeight = settingsPanel.offsetHeight;
       chatContainer.style.top = (45 + settingsPanelHeight) + 'px';
       addSystemMessage('Welcome! Set API Key to begin.');
@@ -359,7 +349,7 @@
   function saveSettings() {
     currentApiKey = apiKeyInput.value.trim();
     if (currentApiKey) {
-      localStorage.setItem('googleAiApiKeyStream', currentApiKey);
+      localStorage.setItem('googleAiApiKeyNonStream', currentApiKey);
       settingsStatus.textContent = 'API Key saved!';
       settingsStatus.style.color = 'green';
       userInput.disabled = false; sendButton.disabled = false;
@@ -375,22 +365,17 @@
     var isCurrentlyVisible = settingsPanel.style.display === 'block';
     if (isCurrentlyVisible) {
       settingsPanel.style.display = 'none';
-      chatContainer.style.top = '45px'; // Header height
-      document.body.className = '';
+      chatContainer.style.top = '45px';
     } else {
       settingsPanel.style.display = 'block';
-      // Ensure panel is rendered to get correct offsetHeight
       var settingsPanelHeight = settingsPanel.offsetHeight;
-      chatContainer.style.top = (45 + settingsPanelHeight) + 'px'; // Header + Panel height
-      document.body.className = 'settings-visible';
+      chatContainer.style.top = (45 + settingsPanelHeight) + 'px';
     }
   }
 
   function startNewChat() {
     messageArea.innerHTML = '';
     addSystemMessage('New chat started.');
-    if (currentBotMessageDiv) currentBotMessageDiv = null;
-    streamBuffer = ""; streamLastProcessedLength = 0;
     userInput.focus();
   }
 
@@ -399,10 +384,11 @@
     wrapper.className = 'message-wrapper';
     var div = document.createElement('div');
     div.className = 'message ' + senderClass;
+
     if (text) {
       if (senderClass === 'user-message' || senderClass === 'bot-error-message') {
         div.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
-      } else {
+      } else { // For 'bot-message', text is already snarkdown processed HTML
         div.innerHTML = text;
       }
     }
@@ -420,47 +406,10 @@
     messageArea.scrollTop = messageArea.scrollHeight;
   }
 
-  function processStreamData(xhrResponseText, targetDiv) {
-    var newData = xhrResponseText.substring(streamLastProcessedLength);
-    streamBuffer += newData;
-    streamLastProcessedLength = xhrResponseText.length;
-    var searchIndex = 0;
-
-    while (searchIndex < streamBuffer.length) {
-      var objStartIndex = -1;
-      for (var i = searchIndex; i < streamBuffer.length; i++) { if (streamBuffer[i] === '{') { objStartIndex = i; break; } }
-      if (objStartIndex === -1) { streamBuffer = streamBuffer.substring(searchIndex); break; }
-      var depth = 0; var objEndIndex = -1;
-      for (var i = objStartIndex; i < streamBuffer.length; i++) {
-        if (streamBuffer[i] === '{') depth++;
-        else if (streamBuffer[i] === '}') { depth--; if (depth === 0) { objEndIndex = i; break; } }
-      }
-      if (objEndIndex !== -1) {
-        var jsonString = streamBuffer.substring(objStartIndex, objEndIndex + 1);
-        try {
-          var parsed = JSON.parse(jsonString);
-          if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content &&
-            parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] &&
-            parsed.candidates[0].content.parts[0].text) {
-
-            var botResponseChunk = parsed.candidates[0].content.parts[0].text;
-            var currentRawText = targetDiv.getAttribute('data-raw-text') || "";
-            currentRawText += botResponseChunk;
-            targetDiv.setAttribute('data-raw-text', currentRawText);
-            targetDiv.innerHTML = snarkdown(currentRawText);
-            messageArea.scrollTop = messageArea.scrollHeight;
-
-          } else if (parsed.error) {
-            var raw = targetDiv.getAttribute('data-raw-text') || "";
-            targetDiv.innerHTML = snarkdown(raw) + '<br><span style="color:red;">Stream Error: ' + escapeHtml(parsed.error.message) + '</span>';
-            if (targetDiv.className.indexOf('bot-error-message') === -1) {
-              targetDiv.className += ' bot-error-message';
-            }
-          }
-          searchIndex = objEndIndex + 1;
-          if (searchIndex >= streamBuffer.length) streamBuffer = "";
-        } catch (e) { streamBuffer = streamBuffer.substring(objStartIndex); searchIndex = 0; break; }
-      } else { streamBuffer = streamBuffer.substring(objStartIndex); searchIndex = 0; break; }
+  function removeThinkingMessage() {
+    var thinkingMsgs = messageArea.getElementsByClassName('system-message');
+    if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.includes('thinking...')) {
+      messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
     }
   }
 
@@ -469,7 +418,7 @@
     if (!msgText) return;
     if (!currentApiKey) {
       addMessageToChat('Error: API Key not set.', 'bot-error-message');
-      if (settingsPanel.style.display !== 'block') { // Show settings if not already visible
+      if (settingsPanel.style.display !== 'block') {
         toggleSettingsPanel();
       }
       return;
@@ -481,84 +430,68 @@
   }
 
   function callGeminiApi(text) {
-    var apiUrl = API_BASE_URL + MODEL_ID + ':streamGenerateContent?key=' + currentApiKey;
+    var apiUrl = API_BASE_URL + MODEL_ID + ':generateContent?key=' + currentApiKey;
     var payload = {
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: text }]
-        }
-      ]
+      contents: [ { role: "user", parts: [{ text: text }] } ]
     };
-    streamBuffer = ""; streamLastProcessedLength = 0;
-    currentBotMessageDiv = null;
-    var thinkingMsgRemoved = false;
+
     var xhr = new XMLHttpRequest();
     xhr.open('POST', apiUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
 
     xhr.onreadystatechange = function() {
-      if (xhr.readyState >= 3) { // LOADING or DONE
-        if (!thinkingMsgRemoved) {
-          var thinkingMsgs = messageArea.getElementsByClassName('system-message');
-          if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
-            messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
-          }
-          thinkingMsgRemoved = true;
-        }
-
-        if (!currentBotMessageDiv) {
-          currentBotMessageDiv = addMessageToChat("", 'bot-message');
-          currentBotMessageDiv.setAttribute('data-raw-text', '');
-        }
-
-        if (currentBotMessageDiv) processStreamData(xhr.responseText, currentBotMessageDiv);
-      }
       if (xhr.readyState === 4) { // DONE
+        removeThinkingMessage();
         userInput.disabled = false; sendButton.disabled = false;
-        if (!thinkingMsgRemoved) { // Ensure it's removed if not done in readyState 3
-          var thinkingMsgs = messageArea.getElementsByClassName('system-message');
-          if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
-            messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
-          }
-        }
-        if (xhr.status !== 200) {
-          var errorTxt = 'API Error: ' + xhr.status + ' ' + (xhr.statusText || 'Request failed');
-          if (xhr.status === 0) { // Often indicates network error / CORS / TLS issue
-            errorTxt = 'API Error: Could not connect to server. Check network or API configuration.';
-          }
-          if (currentBotMessageDiv) {
-            var rawSoFar = currentBotMessageDiv.getAttribute('data-raw-text') || "";
-            var finalErrorHtml = snarkdown(rawSoFar) + '<br><strong style="color:red;">' + escapeHtml(errorTxt) + '</strong>';
-            currentBotMessageDiv.innerHTML = finalErrorHtml;
-            if (currentBotMessageDiv.className.indexOf('bot-error-message') === -1) {
-              currentBotMessageDiv.className += ' bot-error-message';
+
+        if (xhr.status === 200) {
+          try {
+            var response = JSON.parse(xhr.responseText);
+            var botResponseText = '';
+            var messageClass = 'bot-message';
+
+            if (response.candidates && response.candidates[0] &&
+              response.candidates[0].content && response.candidates[0].content.parts &&
+              response.candidates[0].content.parts[0] && response.candidates[0].content.parts[0].text) {
+              botResponseText = response.candidates[0].content.parts[0].text;
+              addMessageToChat(snarkdown(botResponseText), messageClass);
+            } else if (response.promptFeedback && response.promptFeedback.blockReason) {
+              botResponseText = "Blocked: " + response.promptFeedback.blockReason;
+              if (response.promptFeedback.safetyRatings) {
+                botResponseText += " - Safety Ratings: " + JSON.stringify(response.promptFeedback.safetyRatings);
+              }
+              addMessageToChat(botResponseText, 'bot-error-message'); // Use bot-error-message for blocked content
+            } else {
+              botResponseText = 'Error: Received an unexpected response structure.';
+              addMessageToChat(botResponseText, 'bot-error-message');
             }
-          } else {
-            addMessageToChat(errorTxt, 'bot-error-message');
+          } catch (e) {
+            addMessageToChat('Error parsing API response: ' + e.message, 'bot-error-message');
           }
+        } else {
+          var errorTxt = 'API Error: ' + xhr.status + ' ' + (xhr.statusText || 'Request failed');
+          if (xhr.status === 0) {
+            errorTxt = 'API Error: Could not connect. Check network or API config.';
+          } else if (xhr.responseText) {
+            try {
+              var errorResponse = JSON.parse(xhr.responseText);
+              if (errorResponse.error && errorResponse.error.message) {
+                errorTxt += ' - ' + errorResponse.error.message;
+              }
+            } catch (e) { /* Ignore parse error, use original errorTxt */ }
+          }
+          addMessageToChat(errorTxt, 'bot-error-message');
         }
-        streamBuffer = ""; streamLastProcessedLength = 0; // Reset for next call
+        messageArea.scrollTop = messageArea.scrollHeight;
       }
     };
 
-    xhr.onerror = function() { // Network errors
+    xhr.onerror = function() {
+      removeThinkingMessage();
       userInput.disabled = false; sendButton.disabled = false;
-      var thinkingMsgs = messageArea.getElementsByClassName('system-message');
-      if (thinkingMsgs.length > 0 && thinkingMsgs[thinkingMsgs.length-1].textContent.indexOf('thinking...') > -1) {
-        messageArea.removeChild(thinkingMsgs[thinkingMsgs.length-1]);
-      }
       var netErr = 'Network Error: Could not connect. Please check your connection.';
-      if (currentBotMessageDiv) {
-        var rawOnError = currentBotMessageDiv.getAttribute('data-raw-text') || "";
-        currentBotMessageDiv.innerHTML = snarkdown(rawOnError) + '<br><strong style="color:red;">' + escapeHtml(netErr) + '</strong>';
-        if (currentBotMessageDiv.className.indexOf('bot-error-message') === -1) {
-          currentBotMessageDiv.className += ' bot-error-message';
-        }
-      } else {
-        addMessageToChat(netErr, 'bot-error-message');
-      }
-      streamBuffer = ""; streamLastProcessedLength = 0; // Reset
+      addMessageToChat(netErr, 'bot-error-message');
+      messageArea.scrollTop = messageArea.scrollHeight;
     };
 
     xhr.send(JSON.stringify(payload));
@@ -570,13 +503,6 @@
   sendButton.addEventListener('click', sendMessage);
   userInput.addEventListener('keypress', function(e) { if (e.key==='Enter'||e.keyCode===13) { if(!sendButton.disabled) sendMessage();} });
 
-  if (typeof snarkdown === 'undefined') {
-    console.error("snarkdown.js is not loaded. Markdown parsing will not work.");
-    var errorDiv = document.createElement('div');
-    errorDiv.style.color = 'red'; errorDiv.style.padding = '10px'; errorDiv.style.textAlign = 'center';
-    errorDiv.textContent = 'Error: snarkdown.js not found. Markdown rendering will be affected.';
-    document.body.insertBefore(errorDiv, document.body.firstChild);
-  }
   loadSettings();
 </script>
 </body>
