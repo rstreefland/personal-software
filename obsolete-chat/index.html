@@ -160,13 +160,18 @@
             -moz-box-flex: 1;     /* Old flexbox grow */
             box-flex: 1;          /* Old flexbox grow */
             padding:10px; border:1px solid #ccc;
-            -webkit-border-radius:20px; border-radius:20px; margin-right:8px; font-size:0.95em;
+            -webkit-border-radius:20px; border-radius:20px;
+            /* margin-right:8px; /* Removed */
+            font-size:0.95em;
             height: 18px; /* Base height, padding will expand it */
             line-height: 18px;
+            -webkit-box-sizing: border-box; /* Added for robustness */
+            box-sizing: border-box;         /* Added for robustness */
         }
         #sendButton {
             background-color:#007bff; color:white; border:none; padding:10px 18px;
             -webkit-border-radius:20px; border-radius:20px; cursor:pointer; font-size:0.95em; font-weight:bold;
+            margin-left: 8px; /* Added to maintain gap */
         }
         #sendButton:disabled { background-color:#a0c7e8; }
         /* body.settings-visible class is kept if other styles might use it,
@@ -206,7 +211,7 @@
       "~": ["<s>", "</s>"],
       "\n": ["<br />"],
       " ": ["<br />"],
-      "-": ["<hr />"],
+      "-": ["<hr />"]
     };
     function n(e) {
       return e.replace(
