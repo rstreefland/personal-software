@@ -15,10 +15,9 @@
     --update-msg-text: #e65100; /* Dark orange text */
 
     /* Bin colors - these remain constant */
-    --food-bin-bg: #795548; /* Brown */
-    --green-bin-bg: #4caf50; /* Green - Unchanged */
-    --blue-bin-bg: #2196f3; /* Blue */
+    --green-bin-bg: #4caf50; /* Green */
     --black-bin-bg: #424242; /* Dark Grey */
+    --garden-bin-bg: #8d6e63; /* Brown */
     --bin-text-color: white;
 }
 
@@ -108,7 +107,27 @@ section h2 {
 #bins-to-put-out {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
+}
+
+.collection-day {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    background-color: var(--primary-bg);
+}
+
+.collection-date-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+    font-size: 1.1em;
+}
+
+.bins-for-day {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .bin {
@@ -125,17 +144,14 @@ section h2 {
     transform: translateY(-2px);
 }
 
-.food-bin {
-    background-color: var(--food-bin-bg);
-}
 .green-bin {
-    background-color: var(--green-bin-bg); /* Stays green */
-}
-.blue-bin {
-    background-color: var(--blue-bin-bg);
+    background-color: var(--green-bin-bg);
 }
 .black-bin {
     background-color: var(--black-bin-bg);
+}
+.garden-bin {
+    background-color: var(--garden-bin-bg);
 }
 
 #update-message {
@@ -158,13 +174,12 @@ footer {
 }
 
 @media (min-width: 500px) {
-    #bins-to-put-out {
+    .bins-for-day {
         flex-direction: row;
         flex-wrap: wrap;
-        justify-content: center;
     }
     .bin {
-        min-width: 180px;
-        margin: 5px;
+        min-width: 150px;
+        margin: 3px;
     }
 }
