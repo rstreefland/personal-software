@@ -121,9 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateMessageSection = document.getElementById("update-message");
   const collectionInfoSection = document.getElementById("collection-info");
 
-  // const today = new Date();
+  const today = new Date();
   // For testing:
-  const today = new Date("2025-12-08T00:00:00Z"); // Day of last collection
+  // const today = new Date("2025-12-08T00:00:00Z"); // Day of last collection
   // const today = new Date("2025-11-28T12:00:00Z"); // Day after last collection
 
   currentDateDisplay.textContent = `Today: ${today.toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`;
@@ -213,13 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
       binsContainer.className = "bins-for-day";
 
       if (collectionEntry.black) {
-        addBinToContainer(binsContainer, "General Waste", "black-bin");
+        addBinToContainer(binsContainer, "General Waste", "black-bin", "🗑️");
       }
       if (collectionEntry.green) {
-        addBinToContainer(binsContainer, "Recycling", "green-bin");
+        addBinToContainer(binsContainer, "Recycling", "green-bin", "♻️");
       }
       if (collectionEntry.garden) {
-        addBinToContainer(binsContainer, "Garden Waste", "garden-bin");
+        addBinToContainer(binsContainer, "Garden Waste", "garden-bin", "🌿");
       }
 
       dayContainer.appendChild(binsContainer);
@@ -258,10 +258,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function addBinToContainer(container, name, className) {
+  function addBinToContainer(container, name, className, icon) {
     const binDiv = document.createElement("div");
     binDiv.className = `bin ${className}`;
-    binDiv.textContent = name;
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "bin-icon";
+    iconSpan.textContent = icon;
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "bin-label";
+    labelSpan.textContent = name;
+
+    binDiv.appendChild(iconSpan);
+    binDiv.appendChild(labelSpan);
     container.appendChild(binDiv);
   }
 });

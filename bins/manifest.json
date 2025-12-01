@@ -1,10 +1,11 @@
 {
-  "name": "Croydon Bin Day Checker",
+  "name": "Which bins?",
   "short_name": "Which bins?",
-  "description": "Tells you which bins to put out this week for Croydon (Kerbside - Wednesday B).",
+  "description": "Shows which bins to put out this week.",
   "start_url": "/bins/index.html",
   "display": "standalone",
-  "theme_color": "#1976d2",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
   "icons": [
     {
       "src": "icons/icon-48x48.png",

@@ -1,44 +1,38 @@
 :root {
-    --primary-bg: #f4f4f4;
-    --secondary-bg: white;
-    --text-color: #333;
-    --header-bg: #1976d2; /* Blue 700 */
-    --header-text: white;
-    --accent-color: #1976d2; /* Blue 700 */
-    --border-color: #e0e0e0;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --shadow-strong-color: rgba(0, 0, 0, 0.2);
-    --footer-text-color: #777;
+    --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg-dark: rgba(30, 30, 30, 0.95);
+    --text-color: #2d3748;
+    --text-muted: #718096;
+    --accent-color: #667eea;
+    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-    --update-msg-bg: #fff3e0; /* Light orange */
-    --update-msg-border: #ffcc80; /* Orange border */
-    --update-msg-text: #e65100; /* Dark orange text */
+    /* Bin colors */
+    --green-bin-body: linear-gradient(180deg, #48bb78 0%, #276749 100%);
+    --green-bin-lid: #2f855a;
+    --black-bin-body: linear-gradient(180deg, #4a5568 0%, #1a202c 100%);
+    --black-bin-lid: #2d3748;
+    --garden-bin-body: linear-gradient(180deg, #b7791f 0%, #744210 100%);
+    --garden-bin-lid: #975a16;
 
-    /* Bin colors - these remain constant */
-    --green-bin-bg: #4caf50; /* Green */
-    --black-bin-bg: #424242; /* Dark Grey */
-    --garden-bin-bg: #8d6e63; /* Brown */
-    --bin-text-color: white;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-large: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary-bg: #121212;
-        --secondary-bg: #1e1e1e;
-        --text-color: #e0e0e0;
-        --header-bg: #1976d2;
-        --header-text: #e0e0e0;
-        --accent-color: #64b5f6; /* Lighter Blue (Blue 300) for dark mode */
-        --accent-emphasis-color: #90caf9; /* Even Lighter Blue (Blue 200) */
-        --border-color: #333333;
-        --shadow-color: rgba(255, 255, 255, 0.05);
-        --shadow-strong-color: rgba(255, 255, 255, 0.1);
-        --footer-text-color: #999;
-
-        --update-msg-bg: #2c1d00;
-        --update-msg-border: #593a00;
-        --update-msg-text: #ffcc80;
+        --primary-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        --card-bg: rgba(30, 30, 40, 0.95);
+        --text-color: #e2e8f0;
+        --text-muted: #a0aec0;
+        --accent-color: #a78bfa;
+        --accent-gradient: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
     }
+}
+
+* {
+    box-sizing: border-box;
 }
 
 html {
@@ -46,140 +40,317 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--primary-bg);
+    min-height: 100vh;
+    background: var(--primary-bg);
+    background-attachment: fixed;
     color: var(--text-color);
     line-height: 1.6;
-    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Animated background pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 header {
-    background-color: var(--header-bg);
-    color: var(--header-text);
-    padding: 1em 0;
+    position: relative;
+    z-index: 1;
+    padding: 2.5em 1em 2em;
     text-align: center;
-    box-shadow: 0 2px 4px var(--shadow-color);
-    transition: background-color 0.3s, color 0.3s;
+    color: white;
 }
 
 header h1 {
     margin: 0;
-    font-size: 1.8em;
+    font-size: 2em;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    letter-spacing: -0.5px;
 }
 
 header p {
-    margin: 0.2em 0 0;
-    font-size: 0.9em;
+    margin: 0.5em 0 0;
+    font-size: 1em;
+    opacity: 0.9;
+    font-weight: 500;
 }
 
 main {
-    padding: 15px;
-    max-width: 600px;
-    margin: 20px auto;
-    background-color: var(--secondary-bg);
-    border-radius: 8px;
-    box-shadow: 0 0 10px var(--shadow-color);
-    transition: background-color 0.3s;
+    position: relative;
+    z-index: 1;
+    padding: 0 1em 2em;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-section h2 {
-    color: var(--accent-color);
-    margin-top: 0;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.5em;
-    transition: color 0.3s, border-bottom-color 0.3s;
+section#collection-info {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 1.5em;
+    box-shadow: var(--shadow-large);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .collection-day-emphasis {
     text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 1em;
-    color: var(--accent-color);
-    transition: color 0.3s;
-    /*margin-bottom: 1.5em; !* Added margin for better spacing *!*/
+    font-size: 1.3em;
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 1em 0;
+    padding-bottom: 0.8em;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.2);
 }
 
 #bins-to-put-out {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.2em;
 }
 
+/* Collection day cards */
 .collection-day {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    background-color: var(--primary-bg);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border-radius: 16px;
+    padding: 1em;
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    animation: fadeIn 0.4s ease-out backwards;
+}
+
+.collection-day:nth-child(1) { animation-delay: 0.1s; }
+.collection-day:nth-child(2) { animation-delay: 0.2s; }
+.collection-day:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .collection-date-header {
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: var(--accent-color);
+    font-weight: 700;
     font-size: 1.1em;
+    margin-bottom: 0.8em;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.collection-date-header::before {
+    content: '📅';
+    font-size: 1.2em;
 }
 
 .bins-for-day {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 0.8em;
+    justify-content: center;
 }
 
+/* Bin styling - made to look like actual bins! */
 .bin {
-    padding: 15px 20px;
-    border-radius: 6px;
-    color: var(--bin-text-color);
-    font-weight: bold;
+    position: relative;
+    width: 100px;
+    height: 130px;
+    border-radius: 8px 8px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 15px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.7em;
     text-align: center;
-    box-shadow: 0 1px 3px var(--shadow-strong-color);
-    transition: transform 0.2s ease-in-out, background-color 0.3s;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    cursor: default;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow-medium);
 }
 
 .bin:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: var(--shadow-large);
 }
 
+/* Bin lid */
+.bin::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 5%;
+    right: 5%;
+    height: 20px;
+    border-radius: 4px 4px 0 0;
+    transition: transform 0.3s ease;
+}
+
+.bin:hover::before {
+    transform: rotate(-15deg) translateX(-5px);
+    transform-origin: left bottom;
+}
+
+/* Bin handle */
+.bin::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+/* Bin icon and label */
+.bin-icon {
+    font-size: 2.2em;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    display: block;
+}
+
+.bin-label {
+    display: block;
+    line-height: 1.2;
+    padding: 0 5px;
+}
+
+/* Green recycling bin */
 .green-bin {
-    background-color: var(--green-bin-bg);
-}
-.black-bin {
-    background-color: var(--black-bin-bg);
-}
-.garden-bin {
-    background-color: var(--garden-bin-bg);
+    background: var(--green-bin-body);
 }
 
+.green-bin::before {
+    background: var(--green-bin-lid);
+}
+
+/* Black general waste bin */
+.black-bin {
+    background: var(--black-bin-body);
+}
+
+.black-bin::before {
+    background: var(--black-bin-lid);
+}
+
+/* Brown garden waste bin */
+.garden-bin {
+    background: var(--garden-bin-body);
+}
+
+.garden-bin::before {
+    background: var(--garden-bin-lid);
+}
+
+/* Update message */
 #update-message {
     text-align: center;
-    padding: 20px;
-    background-color: var(--update-msg-bg);
-    border: 1px solid var(--update-msg-border);
-    color: var(--update-msg-text);
-    border-radius: 8px;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    padding: 2em;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    color: #92400e;
+    border-radius: 16px;
+    font-weight: 600;
+    box-shadow: var(--shadow-medium);
+}
+
+@media (prefers-color-scheme: dark) {
+    #update-message {
+        background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+        border-color: #f59e0b;
+        color: #fef3c7;
+    }
 }
 
 footer {
+    position: relative;
+    z-index: 1;
     text-align: center;
-    margin-top: 20px;
-    padding: 10px;
+    padding: 1em;
     font-size: 0.8em;
-    color: var(--footer-text-color);
-    transition: color 0.3s;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Responsive adjustments */
+@media (min-width: 400px) {
+    .bin {
+        width: 110px;
+        height: 140px;
+        font-size: 0.75em;
+    }
 }
 
 @media (min-width: 500px) {
-    .bins-for-day {
-        flex-direction: row;
-        flex-wrap: wrap;
+    header h1 {
+        font-size: 2.5em;
     }
+
+    section#collection-info {
+        padding: 2em;
+    }
+
     .bin {
-        min-width: 150px;
-        margin: 3px;
+        width: 120px;
+        height: 150px;
+        font-size: 0.8em;
     }
+}
+
+/* Fun hover effects */
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+.bin:active {
+    animation: wiggle 0.3s ease-in-out;
+}
+
+/* Today's collection highlight */
+.collection-day:has(.collection-date-header:first-child) {
+    position: relative;
+}
+
+/* Pulse animation for "Today" */
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
 }
