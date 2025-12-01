@@ -272,6 +272,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     binDiv.appendChild(iconSpan);
     binDiv.appendChild(labelSpan);
+
+    // Haptic feedback on tap (mobile)
+    binDiv.addEventListener("click", () => {
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    });
+
     container.appendChild(binDiv);
   }
 });

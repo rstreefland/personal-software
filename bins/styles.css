@@ -172,7 +172,7 @@ section#collection-info {
 }
 
 .collection-date-header::before {
-    content: '📅';
+    content: '🗓️';
     font-size: 1.2em;
 }
 
