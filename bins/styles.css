@@ -14,6 +14,8 @@
     --black-bin-lid: #2d3748;
     --garden-bin-body: linear-gradient(180deg, #b7791f 0%, #744210 100%);
     --garden-bin-lid: #975a16;
+    --food-bin-body: linear-gradient(180deg, #38b2ac 0%, #234e52 100%);
+    --food-bin-lid: #2c7a7b;
 
     --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -278,6 +280,15 @@ section#collection-info {
 
 .garden-bin::before {
     background: var(--garden-bin-lid);
+}
+
+/* Teal food waste caddy */
+.food-bin {
+    background: var(--food-bin-body);
+}
+
+.food-bin::before {
+    background: var(--food-bin-lid);
 }
 
 /* Update message */

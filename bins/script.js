@@ -13,9 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
       );
   }
 
+  // Tuesday: Food Waste (food) collected weekly, generated below
   // Thursday: Recycling (green) and General Waste (black) alternate weekly
   // Friday: Garden Waste (garden) collected bi-weekly (except Dec 26)
-  const schedule = [
+  const kerbsideSchedule = [
     // December 2025
     { date: "2025-12-04", green: false, black: true },
     { date: "2025-12-11", green: true, black: false },
@@ -111,6 +112,39 @@ document.addEventListener("DOMContentLoaded", () => {
     { date: "2026-12-11", garden: true },
     { date: "2026-12-17", green: false, black: true },
   ];
+
+  const TUESDAY = 2;
+
+  function formatDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function getWeeklyFoodCollections(firstDateKey, lastDateKey) {
+    const lastDate = new Date(lastDateKey);
+    const nextTuesday = new Date(firstDateKey);
+    const daysUntilTuesday = (TUESDAY - nextTuesday.getDay() + 7) % 7;
+    nextTuesday.setDate(nextTuesday.getDate() + daysUntilTuesday);
+
+    const collections = [];
+    while (nextTuesday <= lastDate) {
+      collections.push({ date: formatDateKey(nextTuesday), food: true });
+      nextTuesday.setDate(nextTuesday.getDate() + 7);
+    }
+
+    return collections;
+  }
+
+  const foodCollections = getWeeklyFoodCollections(
+    kerbsideSchedule[0].date,
+    kerbsideSchedule[kerbsideSchedule.length - 1].date,
+  );
+
+  const schedule = [...kerbsideSchedule, ...foodCollections].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
 
   const currentDateDisplay = document.getElementById("current-date-display");
   const weekCollectionsDisplay = document.getElementById(
@@ -217,6 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (collectionEntry.green) {
         addBinToContainer(binsContainer, "Recycling", "green-bin", "♻️");
+      }
+      if (collectionEntry.food) {
+        addBinToContainer(binsContainer, "Food Waste", "food-bin", "🍎");
       }
       if (collectionEntry.garden) {
         addBinToContainer(binsContainer, "Garden Waste", "garden-bin", "🌿");
