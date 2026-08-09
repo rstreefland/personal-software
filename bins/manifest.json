@@ -4,8 +4,8 @@
   "description": "Shows which bins to put out this week.",
   "start_url": "/bins/index.html",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#667eea",
+  "background_color": "#0f151b",
+  "theme_color": "#0f151b",
   "icons": [
     {
       "src": "icons/icon-48x48.png",

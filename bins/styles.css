@@ -1,35 +1,45 @@
+/* Muted slate blue canvas by day, deep ink by night */
 :root {
-    --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --card-bg-dark: rgba(30, 30, 30, 0.95);
-    --text-color: #2d3748;
-    --text-muted: #718096;
-    --accent-color: #667eea;
-    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --canvas: #b9c8d3;
+    --canvas-stripe: rgba(19, 28, 36, 0.005);
+    --surface: #fbfcfd;
+    --hairline: rgba(19, 28, 36, 0.16);
+    --text-color: #131c24;
+    --text-muted: #43515d;
+    --accent-color: #17222c;
+    --accent-ink: #eef3f7;
 
     /* Bin colors */
-    --green-bin-body: linear-gradient(180deg, #48bb78 0%, #276749 100%);
-    --green-bin-lid: #2f855a;
-    --black-bin-body: linear-gradient(180deg, #4a5568 0%, #1a202c 100%);
-    --black-bin-lid: #2d3748;
-    --garden-bin-body: linear-gradient(180deg, #b7791f 0%, #744210 100%);
-    --garden-bin-lid: #975a16;
-    --food-bin-body: linear-gradient(180deg, #38b2ac 0%, #234e52 100%);
-    --food-bin-lid: #2c7a7b;
+    --green-bin-body: #1c8b4f;
+    --black-bin-body: #2b3038;
+    --garden-bin-body: #8a5a18;
+    --food-bin-body: #0d7d7a;
+    --bin-label: #ffffff;
 
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-large: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-soft: 0 1px 2px rgba(26, 23, 16, 0.10);
+    --shadow-medium: 0 6px 18px -8px rgba(26, 23, 16, 0.4);
+
+    --measure: 34rem;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        --card-bg: rgba(30, 30, 40, 0.95);
-        --text-color: #e2e8f0;
-        --text-muted: #a0aec0;
-        --accent-color: #a78bfa;
-        --accent-gradient: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+        --canvas: #0f151b;
+        --canvas-stripe: rgba(150, 190, 220, 0.005);
+        --surface: #18212a;
+        --hairline: rgba(160, 195, 220, 0.14);
+        --text-color: #e8eef4;
+        --text-muted: #8b9aa8;
+        --accent-color: #7fb0d4;
+        --accent-ink: #0f151b;
+
+        --green-bin-body: #22a05e;
+        --black-bin-body: #454d59;
+        --garden-bin-body: #a06a1e;
+        --food-bin-body: #11968f;
+
+        --shadow-soft: none;
+        --shadow-medium: none;
     }
 }
 
@@ -46,73 +56,62 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background: var(--primary-bg);
+    background-color: var(--canvas);
+    background-image: repeating-linear-gradient(
+        -45deg,
+        var(--canvas-stripe) 0 3px,
+        transparent 3px 16px
+    );
     background-attachment: fixed;
     color: var(--text-color);
-    line-height: 1.6;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* Animated background pattern */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image:
-        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 30%);
-    pointer-events: none;
-    z-index: 0;
-}
-
+/* Masthead: wordmark left, today's date right, hairline rule beneath */
 header {
-    position: relative;
-    z-index: 1;
-    padding: 2.5em 1em 2em;
-    text-align: center;
-    color: white;
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 1.75em 1.25em 1em;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1em;
+    border-bottom: 1px solid var(--hairline);
 }
 
 header h1 {
     margin: 0;
-    font-size: 2em;
-    font-weight: 700;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    letter-spacing: -0.5px;
+    font-size: 0.72em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
 }
 
 header p {
-    margin: 0.5em 0 0;
-    font-size: 1em;
-    opacity: 0.9;
+    margin: 0;
+    font-size: 0.78em;
     font-weight: 500;
+    color: var(--text-muted);
+    text-align: right;
 }
 
 main {
-    position: relative;
-    z-index: 1;
-    padding: 0 1em 2em;
-    max-width: 500px;
+    max-width: var(--measure);
     margin: 0 auto;
+    padding: 0 1.25em 3em;
 }
 
 section#collection-info {
-    background: var(--card-bg);
-    border-radius: 24px;
-    padding: 1.5em;
-    box-shadow: var(--shadow-large);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    animation: slideUp 0.5s ease-out;
+    animation: slideUp 0.4s ease-out;
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(12px);
     }
     to {
         opacity: 1;
@@ -120,148 +119,242 @@ section#collection-info {
     }
 }
 
+/* Eyebrow above the stack of collection days */
 .collection-day-emphasis {
-    text-align: center;
-    font-size: 1.3em;
-    font-weight: 700;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 1em 0;
-    padding-bottom: 0.8em;
-    border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+    margin: 1.6em 0 0.9em;
+    font-size: 0.7em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+}
+
+#collection-note:empty {
+    display: none;
 }
 
 #bins-to-put-out {
     display: flex;
     flex-direction: column;
-    gap: 1.2em;
+    gap: 0.75em;
 }
 
 /* Collection day cards */
 .collection-day {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
-    border-radius: 16px;
-    padding: 1em;
-    border: 1px solid rgba(102, 126, 234, 0.15);
-    animation: fadeIn 0.4s ease-out backwards;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 18px;
+    padding: 0.85em;
+    box-shadow: var(--shadow-soft);
+    animation: fadeIn 0.35s ease-out backwards;
 }
 
-.collection-day:nth-child(1) { animation-delay: 0.1s; }
-.collection-day:nth-child(2) { animation-delay: 0.2s; }
-.collection-day:nth-child(3) { animation-delay: 0.3s; }
+.collection-day:nth-child(1) { animation-delay: 0.05s; }
+.collection-day:nth-child(2) { animation-delay: 0.12s; }
+.collection-day:nth-child(3) { animation-delay: 0.19s; }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
     }
 }
 
 .collection-date-header {
-    font-weight: 700;
-    font-size: 1.1em;
-    margin-bottom: 0.8em;
-    color: var(--text-color);
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5em;
+    padding: 0.15em 0.35em 0.8em;
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
 }
 
-.collection-date-header::before {
-    content: '🗓️';
-    font-size: 1.2em;
+/* "Today" / "Tomorrow" pill */
+.day-flag {
+    background: var(--accent-color);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 0.3em 0.7em;
+    font-size: 0.92em;
+    letter-spacing: 0.12em;
+}
+
+.day-note {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    opacity: 0.85;
+}
+
+/* Wheelie bin: rolls in from the left, lid flaps, wheels spin, then it settles */
+.wheelie-bin {
+    margin-left: auto;
+    flex: none;
+    width: 30px;
+    line-height: 0;
+    color: var(--text-muted);
+    animation: binRollIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+
+.wheelie-bin svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: currentColor;
+    overflow: visible;
+}
+
+.wheelie-bin--black { color: var(--black-bin-body); }
+.wheelie-bin--green { color: var(--green-bin-body); }
+.wheelie-bin--food { color: var(--food-bin-body); }
+.wheelie-bin--garden { color: var(--garden-bin-body); }
+
+.wheelie-bin-lid {
+    transform-box: fill-box;
+    transform-origin: left bottom;
+    animation: binLidFlap 1.5s ease-in-out 0.4s backwards;
+}
+
+.wheelie-bin-wheel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: binWheelSpin 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+
+.wheelie-bin-spoke {
+    fill: var(--surface);
+}
+
+@keyframes binRollIn {
+    0% {
+        transform: translateX(-18px) rotate(-8deg);
+        opacity: 0;
+    }
+    55% {
+        transform: translateX(0) rotate(4deg);
+        opacity: 1;
+    }
+    78% {
+        transform: translateX(0) rotate(-2.5deg);
+    }
+    100% {
+        transform: translateX(0) rotate(0);
+    }
+}
+
+@keyframes binLidFlap {
+    0%, 40% {
+        transform: rotate(0);
+    }
+    55% {
+        transform: rotate(-28deg);
+    }
+    70% {
+        transform: rotate(-5deg);
+    }
+    82% {
+        transform: rotate(-15deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+}
+
+@keyframes binWheelSpin {
+    from {
+        transform: rotate(-200deg);
+    }
+    to {
+        transform: rotate(0);
+    }
 }
 
 .bins-for-day {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.8em;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.5em;
 }
 
-/* Bin styling - made to look like actual bins! */
+/* Bins are solid colour fields: the colour is the information */
 .bin {
     position: relative;
-    width: 100px;
-    height: 130px;
-    border-radius: 8px 8px 12px 12px;
+    overflow: hidden;
+    min-height: 68px;
+    border-radius: 12px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    padding-bottom: 15px;
-    color: white;
-    font-weight: 600;
-    font-size: 0.7em;
-    text-align: center;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    padding: 0.9em 1.1em;
+    color: var(--bin-label);
+    font-weight: 800;
+    font-size: 1.05em;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     cursor: default;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: var(--shadow-medium);
+    transition: transform 0.15s ease;
 }
 
-.bin:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: var(--shadow-large);
+.bin:active {
+    transform: scale(0.985);
 }
 
-/* Bin lid */
-.bin::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 5%;
-    right: 5%;
-    height: 20px;
-    border-radius: 4px 4px 0 0;
-    transition: transform 0.3s ease;
-}
-
-.bin:hover::before {
-    transform: rotate(-15deg) translateX(-5px);
-    transform-origin: left bottom;
-}
-
-/* Bin handle */
+/* Kerbside hazard stripes, faded in from the right edge */
 .bin::after {
     content: '';
     position: absolute;
-    top: -3px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 8px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 4px;
-}
-
-/* Bin icon and label */
-.bin-icon {
-    font-size: 2.2em;
-    margin-bottom: 5px;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 45%;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.16) 0 9px,
+        transparent 9px 18px
+    );
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000);
+    mask-image: linear-gradient(90deg, transparent, #000);
+    pointer-events: none;
 }
 
 .bin-label {
-    display: block;
-    line-height: 1.2;
-    padding: 0 5px;
+    position: relative;
+    z-index: 1;
+    max-width: 11ch;
 }
+
+/* The soonest collection gets display-sized type */
+.collection-day:first-child .bin {
+    min-height: 104px;
+    font-size: 1.65em;
+    letter-spacing: 0.01em;
+}
+
+.collection-day:first-child .collection-date-header {
+    font-size: 0.78em;
+}
+
+.collection-day:first-child .wheelie-bin {
+    width: 42px;
+}
+
+.collection-day:nth-child(2) .wheelie-bin,
+.collection-day:nth-child(2) .wheelie-bin-wheel { animation-delay: 0.12s; }
+.collection-day:nth-child(2) .wheelie-bin-lid { animation-delay: 0.52s; }
+.collection-day:nth-child(3) .wheelie-bin,
+.collection-day:nth-child(3) .wheelie-bin-wheel { animation-delay: 0.19s; }
+.collection-day:nth-child(3) .wheelie-bin-lid { animation-delay: 0.59s; }
 
 /* Green recycling bin */
 .green-bin {
     background: var(--green-bin-body);
-}
-
-.green-bin::before {
-    background: var(--green-bin-lid);
 }
 
 /* Black general waste bin */
@@ -269,17 +362,9 @@ section#collection-info {
     background: var(--black-bin-body);
 }
 
-.black-bin::before {
-    background: var(--black-bin-lid);
-}
-
 /* Brown garden waste bin */
 .garden-bin {
     background: var(--garden-bin-body);
-}
-
-.garden-bin::before {
-    background: var(--garden-bin-lid);
 }
 
 /* Teal food waste caddy */
@@ -287,81 +372,122 @@ section#collection-info {
     background: var(--food-bin-body);
 }
 
-.food-bin::before {
-    background: var(--food-bin-lid);
+/* Nothing left this week: the next collection, shown held back */
+.collection-day.is-upcoming {
+    background: none;
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.collection-day.is-upcoming .bin {
+    min-height: 56px;
+    font-size: 1em;
+    opacity: 0.55;
+}
+
+.collection-day.is-upcoming .bin::after {
+    display: none;
 }
 
 /* Update message */
 #update-message {
-    text-align: center;
-    padding: 2em;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border: 2px solid #f59e0b;
-    color: #92400e;
+    margin-top: 1.6em;
+    padding: 1.6em;
+    background: var(--surface);
+    border: 1px solid var(--accent-color);
+    border-left-width: 5px;
     border-radius: 16px;
+    color: var(--text-color);
     font-weight: 600;
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-soft);
 }
 
-@media (prefers-color-scheme: dark) {
-    #update-message {
-        background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
-        border-color: #f59e0b;
-        color: #fef3c7;
-    }
+#update-message p {
+    margin: 0;
 }
 
 footer {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    padding: 1em;
-    font-size: 0.8em;
-    color: rgba(255,255,255,0.7);
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 0 1.25em 2em;
+    font-size: 0.68em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Calendar subscription: icon only, this is a one-time action */
+#calendar-subscribe {
+    flex: none;
+    line-height: 0;
+    color: var(--text-muted);
+    opacity: 0.65;
+    transition: opacity 0.15s ease;
+}
+
+#calendar-subscribe:hover,
+#calendar-subscribe:focus-visible {
+    opacity: 1;
+}
+
+#calendar-subscribe svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+}
+
+#calendar-subscribe circle {
+    fill: currentColor;
+    stroke: none;
 }
 
 /* Responsive adjustments */
 @media (min-width: 400px) {
     .bin {
-        width: 110px;
-        height: 140px;
-        font-size: 0.75em;
+        font-size: 1.15em;
+    }
+
+    .collection-day:first-child .bin {
+        font-size: 1.9em;
     }
 }
 
 @media (min-width: 500px) {
-    header h1 {
-        font-size: 2.5em;
+    header,
+    main,
+    footer {
+        padding-left: 1.75em;
+        padding-right: 1.75em;
     }
 
-    section#collection-info {
-        padding: 2em;
+    .collection-day {
+        padding: 1em;
     }
 
-    .bin {
-        width: 120px;
-        height: 150px;
-        font-size: 0.8em;
+    .collection-day:first-child .bin {
+        min-height: 120px;
+        font-size: 2.1em;
     }
 }
 
-/* Fun hover effects */
-@keyframes wiggle {
-    0%, 100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
-}
-
-.bin:active {
-    animation: wiggle 0.3s ease-in-out;
-}
-
-/* Today's collection highlight */
-.collection-day:has(.collection-date-header:first-child) {
-    position: relative;
-}
-
-/* Pulse animation for "Today" */
-@keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
 }

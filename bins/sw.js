@@ -1,8 +1,9 @@
-const CACHE_NAME = "croydon-bin-day-cache-v1.6"; // Increment version to force update
+const CACHE_NAME = "croydon-bin-day-cache-v2.0"; // Increment version to force update
 const urlsToCache = [
   "/",
   "/index.html",
   "/styles.css",
+  "/schedule.js",
   "/script.js",
   "/manifest.json",
   "/icons/icon-48x48.png",

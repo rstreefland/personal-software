@@ -13,138 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
       );
   }
 
-  // Tuesday: Food Waste (food) collected weekly, generated below
-  // Thursday: Recycling (green) and General Waste (black) alternate weekly
-  // Friday: Garden Waste (garden) collected bi-weekly (except Dec 26)
-  const kerbsideSchedule = [
-    // December 2025
-    { date: "2025-12-04", green: false, black: true },
-    { date: "2025-12-11", green: true, black: false },
-    { date: "2025-12-12", garden: true },
-    { date: "2025-12-18", green: false, black: true },
-    // No garden collection on Dec 26
-    { date: "2025-12-27", green: true, black: false, note: "Christmas revised day" },
-    // January 2026
-    { date: "2026-01-03", green: false, black: true, note: "New Year revised day" },
-    { date: "2026-01-09", green: true, black: false, garden: true, note: "Revised day" },
-    { date: "2026-01-15", green: false, black: true },
-    { date: "2026-01-22", green: true, black: false },
-    { date: "2026-01-23", garden: true },
-    { date: "2026-01-29", green: false, black: true },
-    // February 2026
-    { date: "2026-02-05", green: true, black: false },
-    { date: "2026-02-06", garden: true },
-    { date: "2026-02-12", green: false, black: true },
-    { date: "2026-02-19", green: true, black: false },
-    { date: "2026-02-20", garden: true },
-    { date: "2026-02-26", green: false, black: true },
-    // March 2026
-    { date: "2026-03-05", green: true, black: false },
-    { date: "2026-03-06", garden: true },
-    { date: "2026-03-12", green: false, black: true },
-    { date: "2026-03-19", green: true, black: false },
-    { date: "2026-03-20", garden: true },
-    { date: "2026-03-26", green: false, black: true },
-    // April 2026
-    { date: "2026-04-02", green: true, black: false },
-    { date: "2026-04-03", garden: true },
-    { date: "2026-04-09", green: false, black: true },
-    { date: "2026-04-16", green: true, black: false },
-    { date: "2026-04-17", garden: true },
-    { date: "2026-04-23", green: false, black: true },
-    { date: "2026-04-30", green: true, black: false },
-    // May 2026
-    { date: "2026-05-01", garden: true },
-    { date: "2026-05-07", green: false, black: true },
-    { date: "2026-05-14", green: true, black: false },
-    { date: "2026-05-15", garden: true },
-    { date: "2026-05-21", green: false, black: true },
-    { date: "2026-05-28", green: true, black: false },
-    { date: "2026-05-29", garden: true },
-    // June 2026
-    { date: "2026-06-04", green: false, black: true },
-    { date: "2026-06-11", green: true, black: false },
-    { date: "2026-06-12", garden: true },
-    { date: "2026-06-18", green: false, black: true },
-    { date: "2026-06-25", green: true, black: false },
-    { date: "2026-06-26", garden: true },
-    // July 2026
-    { date: "2026-07-02", green: false, black: true },
-    { date: "2026-07-09", green: true, black: false },
-    { date: "2026-07-10", garden: true },
-    { date: "2026-07-16", green: false, black: true },
-    { date: "2026-07-23", green: true, black: false },
-    { date: "2026-07-24", garden: true },
-    { date: "2026-07-30", green: false, black: true },
-    // August 2026
-    { date: "2026-08-06", green: true, black: false },
-    { date: "2026-08-07", garden: true },
-    { date: "2026-08-13", green: false, black: true },
-    { date: "2026-08-20", green: true, black: false },
-    { date: "2026-08-21", garden: true },
-    { date: "2026-08-27", green: false, black: true },
-    // September 2026
-    { date: "2026-09-03", green: true, black: false },
-    { date: "2026-09-04", garden: true },
-    { date: "2026-09-10", green: false, black: true },
-    { date: "2026-09-17", green: true, black: false },
-    { date: "2026-09-18", garden: true },
-    { date: "2026-09-24", green: false, black: true },
-    // October 2026
-    { date: "2026-10-01", green: true, black: false },
-    { date: "2026-10-02", garden: true },
-    { date: "2026-10-08", green: false, black: true },
-    { date: "2026-10-15", green: true, black: false },
-    { date: "2026-10-16", garden: true },
-    { date: "2026-10-22", green: false, black: true },
-    { date: "2026-10-29", green: true, black: false },
-    { date: "2026-10-30", garden: true },
-    // November 2026
-    { date: "2026-11-05", green: false, black: true },
-    { date: "2026-11-12", green: true, black: false },
-    { date: "2026-11-13", garden: true },
-    { date: "2026-11-19", green: false, black: true },
-    { date: "2026-11-26", green: true, black: false },
-    { date: "2026-11-27", garden: true },
-    // December 2026
-    { date: "2026-12-03", green: false, black: true },
-    { date: "2026-12-10", green: true, black: false },
-    { date: "2026-12-11", garden: true },
-    { date: "2026-12-17", green: false, black: true },
-  ];
-
-  const TUESDAY = 2;
-
-  function formatDateKey(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
-  function getWeeklyFoodCollections(firstDateKey, lastDateKey) {
-    const lastDate = new Date(lastDateKey);
-    const nextTuesday = new Date(firstDateKey);
-    const daysUntilTuesday = (TUESDAY - nextTuesday.getDay() + 7) % 7;
-    nextTuesday.setDate(nextTuesday.getDate() + daysUntilTuesday);
-
-    const collections = [];
-    while (nextTuesday <= lastDate) {
-      collections.push({ date: formatDateKey(nextTuesday), food: true });
-      nextTuesday.setDate(nextTuesday.getDate() + 7);
-    }
-
-    return collections;
-  }
-
-  const foodCollections = getWeeklyFoodCollections(
-    kerbsideSchedule[0].date,
-    kerbsideSchedule[kerbsideSchedule.length - 1].date,
-  );
-
-  const schedule = [...kerbsideSchedule, ...foodCollections].sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
+  const WHEELIE_BIN_SVG = `
+    <svg viewBox="0 0 44 54" aria-hidden="true" focusable="false">
+      <g class="wheelie-bin-lid">
+        <rect x="4" y="7" width="36" height="6.4" rx="2.6" />
+        <rect x="17.5" y="2.6" width="9" height="4.4" rx="2.2" />
+      </g>
+      <path d="M7.4 15.4h29.2l-2.6 25.9a3.4 3.4 0 0 1-3.4 3.1H13.4a3.4 3.4 0 0 1-3.4-3.1z" />
+      <g class="wheelie-bin-wheel">
+        <circle cx="14.5" cy="48.4" r="4.6" />
+        <rect class="wheelie-bin-spoke" x="13.8" y="44.5" width="1.4" height="7.8" rx="0.7" />
+      </g>
+      <g class="wheelie-bin-wheel">
+        <circle cx="29.5" cy="48.4" r="4.6" />
+        <rect class="wheelie-bin-spoke" x="28.8" y="44.5" width="1.4" height="7.8" rx="0.7" />
+      </g>
+    </svg>`;
 
   const currentDateDisplay = document.getElementById("current-date-display");
   const weekCollectionsDisplay = document.getElementById(
@@ -160,7 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // const today = new Date("2025-12-08T00:00:00Z"); // Day of last collection
   // const today = new Date("2025-11-28T12:00:00Z"); // Day after last collection
 
-  currentDateDisplay.textContent = `Today: ${today.toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`;
+  currentDateDisplay.textContent = today.toLocaleDateString("en-GB", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   const todayNormalized = new Date(today);
   todayNormalized.setHours(0, 0, 0, 0);
@@ -193,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const { start: weekStart, end: weekEnd } = getWeekBounds(todayNormalized);
 
   // Find all collections for this week that are on or after today
-  const weekCollections = schedule.filter((entry) => {
+  const weekCollections = binSchedule.filter((entry) => {
     const collectionDate = new Date(entry.date);
     collectionDate.setHours(0, 0, 0, 0);
     return (
@@ -204,86 +92,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   if (weekCollections.length > 0) {
-    weekCollectionsDisplay.textContent = "This week's collections:";
+    weekCollectionsDisplay.textContent = "Put out this week";
     collectionNoteDisplay.style.display = "none";
     binsToPutOutContainer.innerHTML = "";
 
     for (const collectionEntry of weekCollections) {
-      const collectionDate = new Date(collectionEntry.date);
-      const day = collectionDate.getDate();
-      const weekday = collectionDate.toLocaleDateString("en-GB", {
-        weekday: "long",
-      });
-      const ordinalSuffix = getOrdinalSuffix(day);
-
-      let dateLabel;
-      const tomorrowNormalized = new Date(todayNormalized);
-      tomorrowNormalized.setDate(todayNormalized.getDate() + 1);
-
-      if (collectionDate.toDateString() === todayNormalized.toDateString()) {
-        dateLabel = "Today";
-      } else if (
-        collectionDate.toDateString() === tomorrowNormalized.toDateString()
-      ) {
-        dateLabel = "Tomorrow";
-      } else {
-        dateLabel = `${weekday} ${day}${ordinalSuffix}`;
-      }
-
-      if (collectionEntry.note) {
-        dateLabel += ` (${collectionEntry.note})`;
-      }
-
-      // Create a collection day container
-      const dayContainer = document.createElement("div");
-      dayContainer.className = "collection-day";
-
-      const dateHeader = document.createElement("div");
-      dateHeader.className = "collection-date-header";
-      dateHeader.textContent = dateLabel;
-      dayContainer.appendChild(dateHeader);
-
-      const binsContainer = document.createElement("div");
-      binsContainer.className = "bins-for-day";
-
-      if (collectionEntry.black) {
-        addBinToContainer(binsContainer, "General Waste", "black-bin", "🗑️");
-      }
-      if (collectionEntry.green) {
-        addBinToContainer(binsContainer, "Recycling", "green-bin", "♻️");
-      }
-      if (collectionEntry.food) {
-        addBinToContainer(binsContainer, "Food Waste", "food-bin", "🍎");
-      }
-      if (collectionEntry.garden) {
-        addBinToContainer(binsContainer, "Garden Waste", "garden-bin", "🌿");
-      }
-
-      dayContainer.appendChild(binsContainer);
-      binsToPutOutContainer.appendChild(dayContainer);
+      binsToPutOutContainer.appendChild(
+        buildCollectionDay({ collectionEntry, isUpcoming: false }),
+      );
     }
   } else {
     // No collections this week, show next collection
-    const nextCollection = schedule.find((entry) => {
+    const nextCollection = binSchedule.find((entry) => {
       const collectionDate = new Date(entry.date);
       collectionDate.setHours(0, 0, 0, 0);
       return collectionDate >= todayNormalized;
     });
 
     if (nextCollection) {
-      const collectionDate = new Date(nextCollection.date);
-      const day = collectionDate.getDate();
-      const weekday = collectionDate.toLocaleDateString("en-GB", {
-        weekday: "long",
-      });
-      const month = collectionDate.toLocaleDateString("en-GB", {
-        month: "long",
-      });
-      const ordinalSuffix = getOrdinalSuffix(day);
-
-      weekCollectionsDisplay.textContent = `No collections this week. Next: ${weekday} ${day}${ordinalSuffix} ${month}`;
+      weekCollectionsDisplay.textContent = "Nothing left this week";
       collectionNoteDisplay.style.display = "none";
       binsToPutOutContainer.innerHTML = "";
+      binsToPutOutContainer.appendChild(
+        buildCollectionDay({
+          collectionEntry: nextCollection,
+          isUpcoming: true,
+        }),
+      );
     } else {
       collectionInfoSection.style.display = "none";
       const updateMessageParagraph = updateMessageSection.querySelector("p");
@@ -295,20 +130,92 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function addBinToContainer(container, name, className, icon) {
+  function buildWheelieBin(binKey) {
+    const wheelieBin = document.createElement("span");
+    wheelieBin.className = `wheelie-bin wheelie-bin--${binKey}`;
+    wheelieBin.innerHTML = WHEELIE_BIN_SVG;
+    return wheelieBin;
+  }
+
+  function buildSpan({ className, text }) {
+    const span = document.createElement("span");
+    span.className = className;
+    span.textContent = text;
+    return span;
+  }
+
+  function formatCollectionDate(collectionDate) {
+    const day = collectionDate.getDate();
+    const weekday = collectionDate.toLocaleDateString("en-GB", {
+      weekday: "long",
+    });
+    const month = collectionDate.toLocaleDateString("en-GB", { month: "long" });
+    return `${weekday} ${day}${getOrdinalSuffix(day)} ${month}`;
+  }
+
+  function getDayFlag(collectionDate) {
+    const tomorrowNormalized = new Date(todayNormalized);
+    tomorrowNormalized.setDate(todayNormalized.getDate() + 1);
+
+    if (collectionDate.toDateString() === todayNormalized.toDateString()) {
+      return "Today";
+    }
+    if (collectionDate.toDateString() === tomorrowNormalized.toDateString()) {
+      return "Tomorrow";
+    }
+    return null;
+  }
+
+  function buildCollectionDay({ collectionEntry, isUpcoming }) {
+    const collectionDate = new Date(collectionEntry.date);
+    const binsForDay = BIN_TYPES.filter((binType) => collectionEntry[binType.key]);
+
+    const dayContainer = document.createElement("div");
+    dayContainer.className = isUpcoming
+      ? "collection-day is-upcoming"
+      : "collection-day";
+
+    const dateHeader = document.createElement("div");
+    dateHeader.className = "collection-date-header";
+
+    const dayFlag = isUpcoming ? "Next" : getDayFlag(collectionDate);
+    if (dayFlag) {
+      dateHeader.appendChild(buildSpan({ className: "day-flag", text: dayFlag }));
+    }
+    dateHeader.appendChild(
+      buildSpan({
+        className: "day-date",
+        text: formatCollectionDate(collectionDate),
+      }),
+    );
+    if (collectionEntry.note) {
+      dateHeader.appendChild(
+        buildSpan({ className: "day-note", text: collectionEntry.note }),
+      );
+    }
+    dateHeader.appendChild(buildWheelieBin(binsForDay[0].key));
+    dayContainer.appendChild(dateHeader);
+
+    const binsContainer = document.createElement("div");
+    binsContainer.className = "bins-for-day";
+
+    for (const binType of binsForDay) {
+      addBinToContainer({
+        container: binsContainer,
+        name: binType.name,
+        className: binType.className,
+      });
+    }
+
+    dayContainer.appendChild(binsContainer);
+    return dayContainer;
+  }
+
+  function addBinToContainer({ container, name, className }) {
     const binDiv = document.createElement("div");
     binDiv.className = `bin ${className}`;
 
-    const iconSpan = document.createElement("span");
-    iconSpan.className = "bin-icon";
-    iconSpan.textContent = icon;
-
-    const labelSpan = document.createElement("span");
-    labelSpan.className = "bin-label";
-    labelSpan.textContent = name;
-
-    binDiv.appendChild(iconSpan);
-    binDiv.appendChild(labelSpan);
+    binDiv.appendChild(buildSpan({ className: "bin-label", text: name }));
 
     // Haptic feedback on tap (mobile)
     binDiv.addEventListener("click", () => {
