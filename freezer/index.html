@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="A little less forgotten food. Your freezer, at a glance.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Freezer · What’s tucked away?</title>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./"><span class="brand-icon">✳</span> FREEZER</a><button id="sharing-button" class="quiet">Sharing & backup <span aria-hidden="true">↗</span></button></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">GOOD FOOD, SAVED FOR LATER</p><h1>What’s tucked away?</h1><p class="subtitle">Make a little room. Find something lovely for dinner.</p></div><button id="add-button" class="primary"><span aria-hidden="true">＋</span> Add food</button></section>
+    <section class="overview" aria-label="Freezer overview"><div><strong id="portion-count">0</strong><span>portions on hand</span></div><div><strong id="item-count">0</strong><span>things tucked away</span></div><div class="saved"><span class="status-dot"></span><span id="save-status">Saved on this device</span></div></section>
+    <section id="use-next" class="use-next" hidden><div class="next-symbol" aria-hidden="true">↗</div><div><p class="eyebrow">A GOOD PLACE TO START</p><h2 id="next-name"></h2><p id="next-detail"></p></div><button id="next-use" class="outline">Use a portion</button></section>
+    <section class="inventory-section" aria-label="Inventory"><div class="inventory-heading"><h2>In the freezer <span id="visible-count"></span></h2><label class="sort-label">Sort <select id="sort"><option value="oldest">Oldest first</option><option value="newest">Newest first</option><option value="name">Name A–Z</option></select></label></div>
+      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find food, a drawer, or a note…" aria-label="Search freezer"></label>
+      <div id="filters" class="filters" aria-label="Filter by category"></div>
+      <div class="view-options"><label><input id="show-empty" type="checkbox"> Include finished food</label><span id="offline-status"></span></div>
+      <div id="items" class="items"></div>
+      <div id="empty" class="empty"><span aria-hidden="true">✳</span><h2>A fresh start for your freezer.</h2><p>Add what you’ve tucked away. Future you will thank you.</p><button id="empty-add" class="primary">Add your first food</button></div>
+      <p id="no-results" class="no-results" hidden>No food matches. Try another search or category.</p>
+    </section>
+    <footer><span>A LITTLE LESS FORGOTTEN FOOD.</span><span>Works offline · Yours to keep</span></footer>
+  </main>
+  <dialog id="food-dialog"><form id="food-form"><div class="dialog-heading"><div><p class="eyebrow">TUCK SOMETHING AWAY</p><h2 id="form-title">Add food</h2></div><button type="button" class="close" data-close="food-dialog" aria-label="Close">×</button></div>
+    <label>What is it?<input name="name" required maxlength="80" placeholder="e.g. Sunday’s tomato soup" autocomplete="off"></label>
+    <div class="field-row"><label>Portions<input name="portions" type="number" min="0" max="999" step="1" value="2" required inputmode="numeric"></label><label>Date frozen<input name="frozen" type="date" required></label></div>
+    <div class="field-row"><label>Category<select name="category" id="category-select"></select></label><label>Where is it?<input name="location" maxlength="50" placeholder="e.g. Top drawer" list="locations"></label></div>
+    <datalist id="locations"></datalist><label>A note for later <span class="optional">(optional)</span><textarea name="notes" maxlength="300" rows="2" placeholder="Two portions per tub. Add a splash of water."></textarea></label>
+    <p class="form-hint">Track separate batches separately to keep their frozen dates.</p><div class="dialog-actions"><button type="button" id="delete-button" class="danger" hidden>Delete food</button><button type="submit" class="primary">Save food</button></div>
+  </form></dialog>
+  <dialog id="sharing-dialog"><div class="dialog-heading"><div><p class="eyebrow">YOUR HOUSEHOLD FREEZER</p><h2>Sharing & backup</h2></div><button class="close" data-close="sharing-dialog" aria-label="Close">×</button></div><div id="sharing-content"></div></dialog>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
